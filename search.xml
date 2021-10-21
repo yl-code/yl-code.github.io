@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>数据类型</title>
-    <url>/2020/06/23/yuque/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/</url>
+    <url>/2020/06/23/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/</url>
     <content><![CDATA[<h1 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h1><ul>
 <li>Variables are used to store information to be referenced and manipulated in a computer program.</li>
 <li>They also provide a way of labeling data with a descriptive name, so our programs can be understood more clearly by the reader and ourselves.</li>
@@ -35,7 +35,7 @@
   </entry>
   <entry>
     <title>Python 简介</title>
-    <url>/2020/06/23/yuque/Python%20%E7%AE%80%E4%BB%8B/</url>
+    <url>/2020/06/23/Python%20%E7%AE%80%E4%BB%8B/</url>
     <content><![CDATA[<h4 id="博客园地址"><a href="#博客园地址" class="headerlink" title="博客园地址"></a><a href="https://www.cnblogs.com/Andy0827/" target="_blank" rel="noopener">博客园地址</a></h4><h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><ul>
 <li>Python 的创始人为吉多·范罗苏姆（Guido van Rossum）。</li>
 <li>1989 年的圣诞节期间，吉多·范罗苏姆在阿姆斯特丹为了打发时间，决心开发一个新的脚本解释程序，作为 ABC 语言的一种继承。</li>
@@ -160,14 +160,5 @@
 </li>
 </ul>
 ]]></content>
-  </entry>
-  <entry>
-    <title>武汉211</title>
-    <url>/2019/11/21/%E6%AD%A6%E6%B1%89211/</url>
-    <content><![CDATA[<p>dsfs </p>
-]]></content>
-      <tags>
-        <tag>postgraduate</tag>
-      </tags>
   </entry>
 </search>
