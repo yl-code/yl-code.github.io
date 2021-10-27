@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>问题记录</title>
-    <url>/2021/10/26/%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<div style="background: #E8F7FF;padding:10px;border: 1px solid #ABD2DA;border-radius:5px;margin-bottom:5px;">类数组对象的定义是啥</div>
-
-<ul>
-<li>querySelectAll 返回的 NodeList</li>
-<li>{ length: 1, 0: ‘baz’ }</li>
-</ul>
-<div style="background: #E8F7FF;padding:10px;border: 1px solid #ABD2DA;border-radius:5px;margin-bottom:5px;">对象进行前缀++ 会怎么样</div>
-
-<p>​</p>
-<div style="background: #E8F7FF;padding:10px;border: 1px solid #ABD2DA;border-radius:5px;margin-bottom:5px;">派生对象的定义是啥，Symbol.species 的用法与它的关系</div>
-]]></content>
-  </entry>
-  <entry>
     <title>JS 数据类型浅析之操作符、语句、函数</title>
     <url>/2021/10/26/JS%20%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%B5%85%E6%9E%90%E4%B9%8B%E6%93%8D%E4%BD%9C%E7%AC%A6%E3%80%81%E8%AF%AD%E5%8F%A5%E3%80%81%E5%87%BD%E6%95%B0/</url>
     <content><![CDATA[<h1 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h1><ul>
