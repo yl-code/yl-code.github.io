@@ -88,14 +88,14 @@
 
 
 
-<meta name="description" content="变量 Variables are used to store information to be referenced and manipulated in a computer program. They also provide a way of labeling data with a descriptive name, so our programs can be understood m">
+<meta name="description" content="操作符 ECMA-262 描述了一组可用于操作数据值的操作符，包括数学操作符（如加、减）、位操作符、关系操作符和相等操作符等 ECMAScript 中的操作符是独特的，因为它们可用于各种值，包括字符串、数值、布尔值，甚至还有对象 在应用给对象时，操作符通常会调用 valueOf() 或 toString() 方法来取得可以计算的值  ​ 一元操作符递增&#x2F;递减操作符 操作数据值的规则 对于字符串 如">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据类型">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;06&#x2F;23&#x2F;%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B&#x2F;index.html">
+<meta property="og:title" content="JS 数据类型浅析之操作符、语句、函数">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;10&#x2F;26&#x2F;JS%20%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%B5%85%E6%9E%90%E4%B9%8B%E6%93%8D%E4%BD%9C%E7%AC%A6%E3%80%81%E8%AF%AD%E5%8F%A5%E3%80%81%E5%87%BD%E6%95%B0&#x2F;index.html">
 <meta property="og:site_name" content="Yanglei&#39;s Blog">
-<meta property="og:description" content="变量 Variables are used to store information to be referenced and manipulated in a computer program. They also provide a way of labeling data with a descriptive name, so our programs can be understood m">
+<meta property="og:description" content="操作符 ECMA-262 描述了一组可用于操作数据值的操作符，包括数学操作符（如加、减）、位操作符、关系操作符和相等操作符等 ECMAScript 中的操作符是独特的，因为它们可用于各种值，包括字符串、数值、布尔值，甚至还有对象 在应用给对象时，操作符通常会调用 valueOf() 或 toString() 方法来取得可以计算的值  ​ 一元操作符递增&#x2F;递减操作符 操作数据值的规则 对于字符串 如">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-10-22T04:28:59.328Z">
+<meta property="og:updated_time" content="2021-10-27T02:46:41.546Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -126,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2020/06/23/数据类型/"/>
+  <link rel="canonical" href="http://yoursite.com/2021/10/26/JS 数据类型浅析之操作符、语句、函数/"/>
 
 
 
 
 
-  <title>数据类型 | Yanglei's Blog</title>
+  <title>JS 数据类型浅析之操作符、语句、函数 | Yanglei's Blog</title>
   
 
 
@@ -292,7 +292,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/23/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/10/26/JS%20%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%B5%85%E6%9E%90%E4%B9%8B%E6%93%8D%E4%BD%9C%E7%AC%A6%E3%80%81%E8%AF%AD%E5%8F%A5%E3%80%81%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="杨磊">
@@ -309,7 +309,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">数据类型</h1>
+          <h1 class="post-title" itemprop="name headline">JS 数据类型浅析之操作符、语句、函数</h1>
         
 
         <div class="post-meta">
@@ -321,8 +321,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-23T11:45:43+08:00">
-                2020-06-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-10-26T21:50:22+08:00">
+                2021-10-26
               </time>
             
 
@@ -355,7 +355,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  243
+                  997
                 </span>
               
 
@@ -371,7 +371,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  3
                 </span>
               
             </div>
@@ -392,34 +392,96 @@
       
 
       
-        <h1 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h1><ul>
-<li>Variables are used to store information to be referenced and manipulated in a computer program.</li>
-<li>They also provide a way of labeling data with a descriptive name, so our programs can be understood more clearly by the reader and ourselves.</li>
-<li>It is helpful to think of variables as containers that hold information.</li>
-<li>Their sole purpose is to label and store data in memory.</li>
-<li>This data can then be used throughout your program.</li>
+        <h1 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h1><ul>
+<li>ECMA-262 描述了一组可用于操作数据值的操作符，包括数学操作符（如加、减）、位操作符、关系操作符和相等操作符等</li>
+<li>ECMAScript 中的操作符是独特的，因为它们可用于各种值，包括字符串、数值、布尔值，甚至还有对象</li>
+<li>在应用给对象时，操作符通常会调用 valueOf() 或 toString() 方法来取得可以计算的值</li>
 </ul>
-<h2 id="声明变量"><a href="#声明变量" class="headerlink" title="声明变量"></a>声明变量</h2><ul>
-<li>name = “Silence”</li>
-<li>此行代码声明了一个变量，变量名为: name，变量 name 的值为: “Silence”</li>
+<p>​</p>
+<h2 id="一元操作符"><a href="#一元操作符" class="headerlink" title="一元操作符"></a>一元操作符</h2><h3 id="递增-递减操作符"><a href="#递增-递减操作符" class="headerlink" title="递增/递减操作符"></a>递增/递减操作符</h3><ul>
+<li>操作数据值的规则<ul>
+<li>对于字符串<ul>
+<li>如果是有效的数值形式，则转换为数值再应用改变。变量类型从字符串变成数值</li>
+<li>如果不是有效的数值形式，则将变量的值设置为 NaN 。变量类型从字符串变成数值</li>
 </ul>
-<h3 id="变量定义的规则"><a href="#变量定义的规则" class="headerlink" title="变量定义的规则"></a>变量定义的规则</h3><ul>
-<li><p>变量名只能是字母、数字或下划线的任意组合，但是变量名的第一个字符不能是数字</p>
 </li>
-<li><p>标识符名称是对大小写敏感的。</p>
+<li>对于布尔值<ul>
+<li>如果是 false，则转换为 0 再应用改变。变量类型从布尔值变成数值</li>
+<li>如果是 true，则转换为 1 再应用改变。变量类型从布尔值变成数值</li>
+</ul>
+</li>
+<li>对于浮点值，加 1 或减 1。</li>
+<li>对于对象<ul>
+<li>首先调用其 valueOf() 方法取得可以操作的值。对得到的值应用上述规则</li>
+<li>如果是 NaN，则调用 toString() 并再次应用其他规则。变量类型从对象变成数值</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> s1 = <span class="string">"2"</span>;</span><br><span class="line"><span class="keyword">let</span> s2 = <span class="string">"z"</span>;</span><br><span class="line"><span class="keyword">let</span> b = <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">let</span> f = <span class="number">1.1</span>;</span><br><span class="line"><span class="keyword">let</span> o = &#123;</span><br><span class="line">  valueOf() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">s1++; <span class="comment">// 值变成数值 3</span></span><br><span class="line">s2++; <span class="comment">// 值变成 NaN</span></span><br><span class="line">b++; <span class="comment">// 值变成数值 1</span></span><br><span class="line">f--; <span class="comment">// 值变成 0.10000000000000009（因为浮点数不精确）</span></span><br><span class="line">o--; <span class="comment">// 值变成-2</span></span><br></pre></td></tr></table></figure>
+
+<p>​</p>
+<h3 id="一元加和减"><a href="#一元加和减" class="headerlink" title="一元加和减"></a>一元加和减</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> s1 = <span class="string">"01"</span>;</span><br><span class="line"><span class="keyword">let</span> s2 = <span class="string">"1.1"</span>;</span><br><span class="line"><span class="keyword">let</span> s3 = <span class="string">"z"</span>;</span><br><span class="line"><span class="keyword">let</span> b = <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">let</span> f = <span class="number">1.1</span>;</span><br><span class="line"><span class="keyword">let</span> o = &#123;</span><br><span class="line">  valueOf() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">s1 = +s1; <span class="comment">// 值变成数值 1</span></span><br><span class="line">s2 = +s2; <span class="comment">// 值变成数值 1.1</span></span><br><span class="line">s3 = +s3; <span class="comment">// 值变成 NaN</span></span><br><span class="line">b = +b; <span class="comment">// 值变成数值 0</span></span><br><span class="line">f = +f; <span class="comment">// 不变，还是 1.1</span></span><br><span class="line">o = +o; <span class="comment">// 值变成数值-1</span></span><br></pre></td></tr></table></figure>
+
+<p>​</p>
+<h3 id="位操作符"><a href="#位操作符" class="headerlink" title="位操作符"></a>位操作符</h3><ul>
+<li>ECMAScript 中的所有数值都以 IEEE 754 64 位格式存储，但位操作并不直接应用到 64 位，而是先把值转换为 32 位整数，再进行位操作，之后再把结果转换为 64 位，对开发者而言，就好像只有 32 位整数一样</li>
+<li>有符号整数使用 32 位的前 31 位表示整数值。第 32 位表示数值的符号，如 0 表示正，1 表示负。这一位称为 <code>符号位（sign bit）</code>，它的值决定了数值其余部分的格式。</li>
+<li>负值以一种称为 <code>二补数</code>（或 <code>补码</code>）的二进制编码存储。一个数值的二补数通过如下 3 个步骤计算得到：<ul>
+<li>确定绝对值的二进制表示（如，对于 18，先确定 18 的二进制表示：10010）</li>
+<li>找到数值的 <code>一补数</code>（或 <code>反码</code>），就是每个 0 都变成 1，每个 1 都变成 0</li>
+<li>给结果加 1</li>
+</ul>
+</li>
+<li>在把负值输出为一个二进制字符串时，我们会得到一个前面加了减号的绝对值</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> num = <span class="number">-18</span>;</span><br><span class="line"><span class="built_in">console</span>.log(num.toString(<span class="number">2</span>)); <span class="comment">// "-10010"</span></span><br></pre></td></tr></table></figure>
+
+<p>​</p>
 <ul>
-<li>例如， myname 和 myName 不是一个标识符</li>
-<li>注意前者中的小写 n 和后者中的大写 N</li>
+<li>按位非 ～<ul>
+<li>它的作用是返回数值的一补数</li>
 </ul>
 </li>
-<li><p>以下关键字不能声明为变量名</p>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> num1 = <span class="number">25</span>; <span class="comment">// 二进制 00000000000000000000000000011001</span></span><br><span class="line"><span class="keyword">let</span> num2 = ~num1; <span class="comment">// 二进制 11111111111111111111111111100110</span></span><br><span class="line"><span class="built_in">console</span>.log(num2); <span class="comment">// -26</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 相当于下面运算，但是位运算更快</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> num1 = <span class="number">25</span>;</span><br><span class="line"><span class="keyword">let</span> num2 = -num1 - <span class="number">1</span>;</span><br><span class="line"><span class="built_in">console</span>.log(num2); <span class="comment">// "-26"</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>按位与 &amp;<ul>
+<li>按位与操作在两个位都是 1 时返回 1，在任何一位是 0 时返回 0</li>
+</ul>
 </li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    <span class="string">'and'</span>, <span class="string">'as'</span>, <span class="string">'assert'</span>, <span class="string">'break'</span>, <span class="string">'class'</span>, <span class="string">'continue'</span>, <span class="string">'def'</span>, <span class="string">'del'</span>, <span class="string">'elif'</span>, <span class="string">'else'</span>,</span><br><span class="line">    <span class="string">'except'</span>, <span class="string">'exec'</span>, <span class="string">'finally'</span>, <span class="string">'for'</span>, <span class="string">'from'</span>, <span class="string">'global'</span>, <span class="string">'if'</span>, <span class="string">'import'</span>, <span class="string">'in'</span>, <span class="string">'is'</span>,</span><br><span class="line">    <span class="string">'lambda'</span>, <span class="string">'not'</span>, <span class="string">'or'</span>, <span class="string">'pass'</span>, <span class="string">'print'</span>, <span class="string">'raise'</span>, <span class="string">'return'</span>, <span class="string">'try'</span>, <span class="string">'while'</span>, <span class="string">'with'</span>,</span><br><span class="line">    <span class="string">'yield'</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> &amp; <span class="number">3</span>;</span><br><span class="line"><span class="number">11001</span>;</span><br><span class="line"><span class="number">00011</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="number">00001</span> == <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
 
-<h3 id="变量赋值"><a href="#变量赋值" class="headerlink" title="变量赋值"></a>变量赋值</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name = <span class="string">"big-frontend"</span></span><br><span class="line">name2 = name</span><br><span class="line">print(name, name2)</span><br></pre></td></tr></table></figure>
+<p>​</p>
+<ul>
+<li>按位或 |<ul>
+<li>按位或操作在至少一位是 1 时返回 1，两位都是 0 时返回 0</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> | <span class="number">3</span>;</span><br><span class="line"><span class="number">11001</span>;</span><br><span class="line"><span class="number">00011</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="number">11011</span> == <span class="number">27</span>;</span><br></pre></td></tr></table></figure>
 
-<p>#</p>
+<ul>
+<li>按位异或 ^<ul>
+<li>该操作两位相同是返回 0，不同时返回 1</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> ^ <span class="number">3</span>;</span><br><span class="line"><span class="number">11001</span>;</span><br><span class="line"><span class="number">00011</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="number">11010</span> == <span class="number">26</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>左移 &lt;&lt;<ul>
+<li>该操作会按照指定的位数将数值的所有位向左移动</li>
+<li>左移会保留它所操作数值的符号，-2 左移 5 位，将得到 -64</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> oldValue = <span class="number">2</span>; <span class="comment">// 等于二进制 10</span></span><br><span class="line"><span class="keyword">let</span> newValue = oldValue &lt;&lt; <span class="number">5</span>; <span class="comment">// 等于二进制 1000000，即十进制 64</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> oldValue = <span class="number">-2</span>;</span><br><span class="line"><span class="keyword">let</span> newValue = oldValue &lt;&lt; <span class="number">5</span>; <span class="comment">// 64</span></span><br></pre></td></tr></table></figure>
+
+<p>​</p>
 
       
     </div>
@@ -454,8 +516,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/06/23/Python%20%E7%AE%80%E4%BB%8B/" rel="next" title="Python 简介">
-                <i class="fa fa-chevron-left"></i> Python 简介
+              <a href="/2021/10/24/JS%20%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%B5%85%E6%9E%90%E4%B9%8B%20String%E3%80%81Symbol%E3%80%81Object/" rel="next" title="JS 数据类型浅析之 String、Symbol、Object">
+                <i class="fa fa-chevron-left"></i> JS 数据类型浅析之 String、Symbol、Object
               </a>
             
           </div>
@@ -463,6 +525,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/10/26/%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/" rel="prev" title="问题记录">
+                问题记录 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -545,7 +611,7 @@
               
                 <a href="/archives%7C%7C%20archive">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">文章</span>
                 </a>
               </div>
@@ -646,7 +712,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#变量"><span class="nav-number">1.</span> <span class="nav-text">变量</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#声明变量"><span class="nav-number">1.1.</span> <span class="nav-text">声明变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#变量定义的规则"><span class="nav-number">1.1.1.</span> <span class="nav-text">变量定义的规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量赋值"><span class="nav-number">1.1.2.</span> <span class="nav-text">变量赋值</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#操作符"><span class="nav-number">1.</span> <span class="nav-text">操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一元操作符"><span class="nav-number">1.1.</span> <span class="nav-text">一元操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#递增-递减操作符"><span class="nav-number">1.1.1.</span> <span class="nav-text">递增/递减操作符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一元加和减"><span class="nav-number">1.1.2.</span> <span class="nav-text">一元加和减</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位操作符"><span class="nav-number">1.1.3.</span> <span class="nav-text">位操作符</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -682,7 +748,7 @@
     
       <span class="post-meta-item-text">站点总字数&#58;</span>
     
-    <span title="站点总字数">2.5k</span>
+    <span title="站点总字数">11.1k</span>
 
 <span class="post-meta-divider">|</span>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
