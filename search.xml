@@ -9,7 +9,8 @@
 <li>在应用给对象时，操作符通常会调用 valueOf() 或 toString() 方法来取得可以计算的值</li>
 </ul>
 <p>​</p>
-<h2 id="一元操作符"><a href="#一元操作符" class="headerlink" title="一元操作符"></a>一元操作符</h2><h3 id="递增-递减操作符"><a href="#递增-递减操作符" class="headerlink" title="递增/递减操作符"></a>递增/递减操作符</h3><ul>
+<h2 id="一元操作符"><a href="#一元操作符" class="headerlink" title="一元操作符"></a>一元操作符</h2><ul>
+<li>递增/递减操作符<ul>
 <li>操作数据值的规则<ul>
 <li>对于字符串<ul>
 <li>如果是有效的数值形式，则转换为数值再应用改变。变量类型从字符串变成数值</li>
@@ -30,13 +31,18 @@
 </ul>
 </li>
 </ul>
+</li>
+</ul>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> s1 = <span class="string">"2"</span>;</span><br><span class="line"><span class="keyword">let</span> s2 = <span class="string">"z"</span>;</span><br><span class="line"><span class="keyword">let</span> b = <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">let</span> f = <span class="number">1.1</span>;</span><br><span class="line"><span class="keyword">let</span> o = &#123;</span><br><span class="line">  valueOf() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">s1++; <span class="comment">// 值变成数值 3</span></span><br><span class="line">s2++; <span class="comment">// 值变成 NaN</span></span><br><span class="line">b++; <span class="comment">// 值变成数值 1</span></span><br><span class="line">f--; <span class="comment">// 值变成 0.10000000000000009（因为浮点数不精确）</span></span><br><span class="line">o--; <span class="comment">// 值变成-2</span></span><br></pre></td></tr></table></figure>
 
 <p>​</p>
-<h3 id="一元加和减"><a href="#一元加和减" class="headerlink" title="一元加和减"></a>一元加和减</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> s1 = <span class="string">"01"</span>;</span><br><span class="line"><span class="keyword">let</span> s2 = <span class="string">"1.1"</span>;</span><br><span class="line"><span class="keyword">let</span> s3 = <span class="string">"z"</span>;</span><br><span class="line"><span class="keyword">let</span> b = <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">let</span> f = <span class="number">1.1</span>;</span><br><span class="line"><span class="keyword">let</span> o = &#123;</span><br><span class="line">  valueOf() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">s1 = +s1; <span class="comment">// 值变成数值 1</span></span><br><span class="line">s2 = +s2; <span class="comment">// 值变成数值 1.1</span></span><br><span class="line">s3 = +s3; <span class="comment">// 值变成 NaN</span></span><br><span class="line">b = +b; <span class="comment">// 值变成数值 0</span></span><br><span class="line">f = +f; <span class="comment">// 不变，还是 1.1</span></span><br><span class="line">o = +o; <span class="comment">// 值变成数值-1</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>一元加和减</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> s1 = <span class="string">"01"</span>;</span><br><span class="line"><span class="keyword">let</span> s2 = <span class="string">"1.1"</span>;</span><br><span class="line"><span class="keyword">let</span> s3 = <span class="string">"z"</span>;</span><br><span class="line"><span class="keyword">let</span> b = <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">let</span> f = <span class="number">1.1</span>;</span><br><span class="line"><span class="keyword">let</span> o = &#123;</span><br><span class="line">  valueOf() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">s1 = +s1; <span class="comment">// 值变成数值 1</span></span><br><span class="line">s2 = +s2; <span class="comment">// 值变成数值 1.1</span></span><br><span class="line">s3 = +s3; <span class="comment">// 值变成 NaN</span></span><br><span class="line">b = +b; <span class="comment">// 值变成数值 0</span></span><br><span class="line">f = +f; <span class="comment">// 不变，还是 1.1</span></span><br><span class="line">o = +o; <span class="comment">// 值变成数值-1</span></span><br></pre></td></tr></table></figure>
 
 <p>​</p>
-<h3 id="位操作符"><a href="#位操作符" class="headerlink" title="位操作符"></a>位操作符</h3><ul>
+<h2 id="位操作符"><a href="#位操作符" class="headerlink" title="位操作符"></a>位操作符</h2><ul>
 <li>ECMAScript 中的所有数值都以 IEEE 754 64 位格式存储，但位操作并不直接应用到 64 位，而是先把值转换为 32 位整数，再进行位操作，之后再把结果转换为 64 位，对开发者而言，就好像只有 32 位整数一样</li>
 <li>有符号整数使用 32 位的前 31 位表示整数值。第 32 位表示数值的符号，如 0 表示正，1 表示负。这一位称为 <code>符号位（sign bit）</code>，它的值决定了数值其余部分的格式。</li>
 <li>负值以一种称为 <code>二补数</code>（或 <code>补码</code>）的二进制编码存储。一个数值的二补数通过如下 3 个步骤计算得到：<ul>
@@ -56,7 +62,7 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> num1 = <span class="number">25</span>; <span class="comment">// 二进制 00000000000000000000000000011001</span></span><br><span class="line"><span class="keyword">let</span> num2 = ~num1; <span class="comment">// 二进制 11111111111111111111111111100110</span></span><br><span class="line"><span class="built_in">console</span>.log(num2); <span class="comment">// -26</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 相当于下面运算，但是位运算更快</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> num1 = <span class="number">25</span>;</span><br><span class="line"><span class="keyword">let</span> num2 = -num1 - <span class="number">1</span>;</span><br><span class="line"><span class="built_in">console</span>.log(num2); <span class="comment">// "-26"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> num1 = <span class="number">25</span>;</span><br><span class="line"><span class="keyword">let</span> num2 = ~num1;</span><br><span class="line"><span class="built_in">console</span>.log(num2); <span class="comment">// -26</span></span><br><span class="line"><span class="comment">// 00000000000000000000000000011001</span></span><br><span class="line"><span class="comment">// 11111111111111111111111111100110 == -26</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 相当于下面运算，但是位运算更快</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> num1 = <span class="number">25</span>;</span><br><span class="line"><span class="keyword">let</span> num2 = -num1 - <span class="number">1</span>;</span><br><span class="line"><span class="built_in">console</span>.log(num2); <span class="comment">// "-26"</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>按位与 &amp;<ul>
@@ -64,7 +70,7 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> &amp; <span class="number">3</span>;</span><br><span class="line"><span class="number">11001</span>;</span><br><span class="line"><span class="number">00011</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="number">00001</span> == <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> &amp; <span class="number">3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="comment">// 11001</span></span><br><span class="line"><span class="comment">// 00011</span></span><br><span class="line"><span class="comment">// 00001 == 1</span></span><br></pre></td></tr></table></figure>
 
 <p>​</p>
 <ul>
@@ -73,7 +79,7 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> | <span class="number">3</span>;</span><br><span class="line"><span class="number">11001</span>;</span><br><span class="line"><span class="number">00011</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="number">11011</span> == <span class="number">27</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> | <span class="number">3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="comment">// 11001</span></span><br><span class="line"><span class="comment">// 00011</span></span><br><span class="line"><span class="comment">// 11011 == 27</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>按位异或 ^<ul>
@@ -81,7 +87,7 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> ^ <span class="number">3</span>;</span><br><span class="line"><span class="number">11001</span>;</span><br><span class="line"><span class="number">00011</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="number">11010</span> == <span class="number">26</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> result = <span class="number">25</span> ^ <span class="number">3</span>;</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br><span class="line"><span class="comment">// 11001</span></span><br><span class="line"><span class="comment">// 00011</span></span><br><span class="line"><span class="comment">// 11010 == 26</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>左移 &lt;&lt;<ul>
@@ -90,9 +96,131 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> oldValue = <span class="number">2</span>; <span class="comment">// 等于二进制 10</span></span><br><span class="line"><span class="keyword">let</span> newValue = oldValue &lt;&lt; <span class="number">5</span>; <span class="comment">// 等于二进制 1000000，即十进制 64</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> oldValue = <span class="number">-2</span>;</span><br><span class="line"><span class="keyword">let</span> newValue = oldValue &lt;&lt; <span class="number">5</span>; <span class="comment">// 64</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> oldValue = <span class="number">2</span>; <span class="comment">// 等于二进制 10</span></span><br><span class="line"><span class="keyword">let</span> newValue = oldValue &lt;&lt; <span class="number">5</span>; <span class="comment">// 等于二进制 1000000，即十进制 64</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> oldValue2 = <span class="number">-2</span>;</span><br><span class="line"><span class="keyword">let</span> newValue2 = oldValue &lt;&lt; <span class="number">5</span>; <span class="comment">// 64</span></span><br></pre></td></tr></table></figure>
 
+<ul>
+<li>有符号有移 &gt;&gt;<ul>
+<li>该操作符会将数值的所有 32 位都向右移，同时保留符号（正或负）</li>
+<li>有符号右移实际上是左移的逆运算</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> oldValue = <span class="number">64</span>; <span class="comment">// 等于二进制 1000000</span></span><br><span class="line"><span class="keyword">let</span> newValue = oldValue &gt;&gt; <span class="number">5</span>; <span class="comment">// 等于二进制 10，即十进制 2</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> oldValue2 = <span class="number">-64</span>; <span class="comment">// 等于二进制 1000000</span></span><br><span class="line"><span class="keyword">let</span> newValue2 = oldValue &gt;&gt; <span class="number">5</span>; <span class="comment">// 等于二进制 -10，即十进制 -2</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>无符号右移 &gt;&gt;&gt;<ul>
+<li>该操作符会将数值的所有 32 位都向右移，包括符号位一起移动，所以操作负数时，得到结果会变化很大</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> oldValue = <span class="number">-64</span>;</span><br><span class="line"><span class="keyword">let</span> newValue = oldValue &gt;&gt;&gt; <span class="number">5</span>; <span class="comment">// 134217726</span></span><br><span class="line"><span class="comment">// 等于二进制 11111111111111111111111111000000</span></span><br><span class="line"><span class="comment">// 变为      00000111111111111111111111111110</span></span><br><span class="line"><span class="comment">// 等于十进制 134217726</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="布尔操作符"><a href="#布尔操作符" class="headerlink" title="布尔操作符"></a>布尔操作符</h2><ul>
+<li><p>布尔操作符一共有 3 个：逻辑非、逻辑与和逻辑或</p>
+</li>
+<li><p>逻辑非 !</p>
+<ul>
+<li>运算规则如下：<ul>
+<li>如果操作数是对象，则返回 false</li>
+<li>如果操作数是空字符串，则返回 true</li>
+<li>如果操作数是非空字符串，则返回 false</li>
+<li>如果操作数是数值 0，则返回 true</li>
+<li>如果操作数是非 0 数值（包括 Infinity），则返回 false</li>
+<li>如果操作数是 null，则返回 true</li>
+<li>如果操作数是 NaN，则返回 true</li>
+<li>如果操作数是 undefined，则返回 true</li>
+</ul>
+</li>
+<li>同时使用两个叹号（!!），相当于调用了转型函数 Boolean()</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(!<span class="literal">false</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="string">"blue"</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="number">0</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="literal">NaN</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="string">""</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="number">12345</span>); <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="string">"blue"</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="number">0</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="literal">NaN</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="string">""</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="number">12345</span>); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>逻辑与 &amp;&amp;</p>
+<ul>
+<li>运算规则如下：<ul>
+<li>如果第一个操作数是对象，则返回第二个操作数</li>
+<li>如果第二个操作数是对象，则只有第一个操作数求值为 true 才会返回该对象</li>
+<li>如果两个操作数都是对象，则返回第二个操作数</li>
+<li>如果有一个操作数是 null，则返回 null</li>
+<li>如果有一个操作数是 NaN，则返回 NaN</li>
+<li>如果有一个操作数是 undefined，则返回 undefined</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>逻辑或 ||</p>
+<ul>
+<li>运算规则如下：<ul>
+<li>如果第一个操作数是对象，则返回第一个操作数</li>
+<li>如果第一个操作数求值为 false，则返回第二个操作数</li>
+<li>如果两个操作数都是对象，则返回第一个操作数</li>
+<li>如果两个操作数都是 null，则返回 null</li>
+<li>如果两个操作数都是 NaN，则返回 NaN</li>
+<li>如果两个操作数都是 undefined，则返回 undefined</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="乘性操作符"><a href="#乘性操作符" class="headerlink" title="乘性操作符"></a>乘性操作符</h2><ul>
+<li>ECMAScript 定义了 3 个乘性操作符：乘法、除法和取模</li>
+<li>但在处理非数值时，它们也会包含一些自动的类型转换，如：空字符串会转换为 0，布尔值 true 会转换为 1</li>
+</ul>
 <p>​</p>
+<ul>
+<li>乘法操作符 *<ul>
+<li>在操作特殊值时的一些特殊行为：<ul>
+<li>如果操作数都是数值，则执行常规的乘法运算，不能表示乘积，则返回 Infinity 或 -Infinity</li>
+<li>如果有任一操作数是 NaN，则返回 NaN</li>
+<li>如果是 Infinity 乘以 0，则返回 NaN</li>
+<li>如果是 Infinity 乘以非 0 的有限数值，则根据第二个操作数的符号返回 Infinity 或-Infinity</li>
+<li>如果是 Infinity 乘以 Infinity，则返回 Infinity</li>
+<li>如果有不是数值的操作数，则先在后台用 Number() 将其转换为数值，然后再应用上述规则</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>​</p>
+<ul>
+<li>除法操作符 /<ul>
+<li>在操作特殊值时的一些特殊行为：<ul>
+<li>如果操作数都是数值，则执行常规的除法运算，如果 ECMAScript 不能表示商，则返回 Infinity 或 -Infinity</li>
+<li>如果有任一操作数是 NaN，则返回 NaN</li>
+<li>如果是 Infinity 除以 Infinity，则返回 NaN</li>
+<li>如果是 0 除以 0，则返回 NaN</li>
+<li>如果是非 0 的有限值除以 0，则根据第一个操作数的符号返回 Infinity 或-Infinity</li>
+<li>如果是 Infinity 除以任何数值，则根据第二个操作数的符号返回 Infinity 或-Infinity</li>
+<li>如果有不是数值的操作数，则先在后台用 Number() 函数将其转换为数值，然后再应用上述规则</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>​</p>
+<ul>
+<li>取模操作符 %<ul>
+<li>在操作特殊值时的一些特殊行为：<ul>
+<li>如果操作数是数值，则执行常规取余运算</li>
+<li>如果被除数是无限值，除数是有限值，则返回 NaN，Infinity % 1 == NaN</li>
+<li>如果被除数是有限值，除数是 0，则返回 NaN</li>
+<li>如果是 Infinity 取余 Infinity，则返回 NaN</li>
+<li>如果被除数是有限值，除数是无限值，则返回被除数，1 % Infinity == 1</li>
+<li>如果被除数是 0，除数不是 0，则返回 0，0 % 0 == NaN</li>
+<li>如果有不是数值的操作数，则先在后台用 Number() 函数将其转换为数值，然后再应用上述规则</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>​</p>
+<h2 id="指数操作符"><a href="#指数操作符" class="headerlink" title="指数操作符"></a>指数操作符</h2><ul>
+<li>ECMAScript 7 新增了指数操作符，Math.pow()现在有了自己的操作符 **</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.pow(<span class="number">3</span>, <span class="number">2</span>); <span class="comment">// 9</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">3</span> ** <span class="number">2</span>); <span class="comment">// 9</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.pow(<span class="number">16</span>, <span class="number">0.5</span>); <span class="comment">// 4</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">16</span>** <span class="number">0.5</span>); <span class="comment">// 4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sqrt = <span class="number">16</span>;</span><br><span class="line">sqrt **= <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">console</span>.log(sqrt); <span class="comment">// 4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> squared = <span class="number">3</span>;</span><br><span class="line">squared **= <span class="number">2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(squared); <span class="comment">// 9</span></span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
