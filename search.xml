@@ -41,7 +41,6 @@
 </ul>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> s1 = <span class="string">"01"</span>;</span><br><span class="line"><span class="keyword">let</span> s2 = <span class="string">"1.1"</span>;</span><br><span class="line"><span class="keyword">let</span> s3 = <span class="string">"z"</span>;</span><br><span class="line"><span class="keyword">let</span> b = <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">let</span> f = <span class="number">1.1</span>;</span><br><span class="line"><span class="keyword">let</span> o = &#123;</span><br><span class="line">  valueOf() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">s1 = +s1; <span class="comment">// 值变成数值 1</span></span><br><span class="line">s2 = +s2; <span class="comment">// 值变成数值 1.1</span></span><br><span class="line">s3 = +s3; <span class="comment">// 值变成 NaN</span></span><br><span class="line">b = +b; <span class="comment">// 值变成数值 0</span></span><br><span class="line">f = +f; <span class="comment">// 不变，还是 1.1</span></span><br><span class="line">o = +o; <span class="comment">// 值变成数值-1</span></span><br></pre></td></tr></table></figure>
 
-<p>​</p>
 <h2 id="位操作符"><a href="#位操作符" class="headerlink" title="位操作符"></a>位操作符</h2><ul>
 <li>ECMAScript 中的所有数值都以 IEEE 754 64 位格式存储，但位操作并不直接应用到 64 位，而是先把值转换为 32 位整数，再进行位操作，之后再把结果转换为 64 位，对开发者而言，就好像只有 32 位整数一样</li>
 <li>有符号整数使用 32 位的前 31 位表示整数值。第 32 位表示数值的符号，如 0 表示正，1 表示负。这一位称为 <code>符号位（sign bit）</code>，它的值决定了数值其余部分的格式。</li>
@@ -116,10 +115,8 @@
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> oldValue = <span class="number">-64</span>;</span><br><span class="line"><span class="keyword">let</span> newValue = oldValue &gt;&gt;&gt; <span class="number">5</span>; <span class="comment">// 134217726</span></span><br><span class="line"><span class="comment">// 等于二进制 11111111111111111111111111000000</span></span><br><span class="line"><span class="comment">// 变为      00000111111111111111111111111110</span></span><br><span class="line"><span class="comment">// 等于十进制 134217726</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="布尔操作符"><a href="#布尔操作符" class="headerlink" title="布尔操作符"></a>布尔操作符</h2><ul>
-<li><p>布尔操作符一共有 3 个：逻辑非、逻辑与和逻辑或</p>
-</li>
-<li><p>逻辑非 !</p>
-<ul>
+<li>布尔操作符一共有 3 个：逻辑非、逻辑与和逻辑或</li>
+<li>逻辑非 !<ul>
 <li>运算规则如下：<ul>
 <li>如果操作数是对象，则返回 false</li>
 <li>如果操作数是空字符串，则返回 true</li>
@@ -138,8 +135,7 @@
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(!<span class="literal">false</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="string">"blue"</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="number">0</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="literal">NaN</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="string">""</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!<span class="number">12345</span>); <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="string">"blue"</span>); <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="number">0</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="literal">NaN</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="string">""</span>); <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(!!<span class="number">12345</span>); <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
 
 <ul>
-<li><p>逻辑与 &amp;&amp;</p>
-<ul>
+<li>逻辑与 &amp;&amp;<ul>
 <li>运算规则如下：<ul>
 <li>如果第一个操作数是对象，则返回第二个操作数</li>
 <li>如果第二个操作数是对象，则只有第一个操作数求值为 true 才会返回该对象</li>
@@ -151,8 +147,7 @@
 </li>
 </ul>
 </li>
-<li><p>逻辑或 ||</p>
-<ul>
+<li>逻辑或 ||<ul>
 <li>运算规则如下：<ul>
 <li>如果第一个操作数是对象，则返回第一个操作数</li>
 <li>如果第一个操作数求值为 false，则返回第二个操作数</li>
@@ -166,12 +161,12 @@
 </li>
 </ul>
 <h2 id="乘性操作符"><a href="#乘性操作符" class="headerlink" title="乘性操作符"></a>乘性操作符</h2><ul>
-<li>ECMAScript 定义了 3 个乘性操作符：乘法、除法和取模</li>
-<li>但在处理非数值时，它们也会包含一些自动的类型转换，如：空字符串会转换为 0，布尔值 true 会转换为 1</li>
-</ul>
-<p>​</p>
+<li><p>ECMAScript 定义了 3 个乘性操作符：乘法、除法和取模</p>
+</li>
+<li><p>在处理非数值时，它们也会包含一些自动的类型转换，如：空字符串会转换为 0，布尔值 true 会转换为 1</p>
+</li>
+<li><p>乘法操作符 *</p>
 <ul>
-<li>乘法操作符 *<ul>
 <li>在操作特殊值时的一些特殊行为：<ul>
 <li>如果操作数都是数值，则执行常规的乘法运算，不能表示乘积，则返回 Infinity 或 -Infinity</li>
 <li>如果有任一操作数是 NaN，则返回 NaN</li>
@@ -183,10 +178,8 @@
 </li>
 </ul>
 </li>
-</ul>
-<p>​</p>
+<li><p>除法操作符 /</p>
 <ul>
-<li>除法操作符 /<ul>
 <li>在操作特殊值时的一些特殊行为：<ul>
 <li>如果操作数都是数值，则执行常规的除法运算，如果 ECMAScript 不能表示商，则返回 Infinity 或 -Infinity</li>
 <li>如果有任一操作数是 NaN，则返回 NaN</li>
