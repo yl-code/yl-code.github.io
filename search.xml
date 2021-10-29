@@ -214,6 +214,34 @@
 <li>ECMAScript 7 新增了指数操作符，Math.pow()现在有了自己的操作符 **</li>
 </ul>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.pow(<span class="number">3</span>, <span class="number">2</span>); <span class="comment">// 9</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">3</span> ** <span class="number">2</span>); <span class="comment">// 9</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.pow(<span class="number">16</span>, <span class="number">0.5</span>); <span class="comment">// 4</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">16</span>** <span class="number">0.5</span>); <span class="comment">// 4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sqrt = <span class="number">16</span>;</span><br><span class="line">sqrt **= <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">console</span>.log(sqrt); <span class="comment">// 4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> squared = <span class="number">3</span>;</span><br><span class="line">squared **= <span class="number">2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(squared); <span class="comment">// 9</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="加性操作符"><a href="#加性操作符" class="headerlink" title="加性操作符"></a>加性操作符</h2><ul>
+<li>加性操作符，指的是加法和减法操作符，与乘性操作符类似，加性操作符在后台会发生不同数据类型的转换</li>
+</ul>
+<p>​</p>
+<ul>
+<li>加法操作符<ul>
+<li>如果有任一操作数是 NaN，则返回 NaN</li>
+<li>如果两个操作数都是字符串，则将第二个字符串拼接到第一个字符串后面，如果只有一个操作数是字符串，则将另一个操作数转换为字符串，再将两个字符串拼接在一起</li>
+<li>如果有任一操作数是对象、数值或布尔值，则调用它们的 toString() 方法以获取字符串，然后再应用前面的关于字符串的运算规则。<ul>
+<li>对于 undefined 和 null，则调用 String() 函数，分别获取 “undefined” 和 “null”</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">-<span class="literal">Infinity</span> + <span class="literal">Infinity</span> == <span class="literal">NaN</span>;</span><br><span class="line">(((<span class="literal">Infinity</span> + <span class="literal">Infinity</span> == <span class="literal">Infinity</span> - <span class="literal">Infinity</span> - <span class="literal">Infinity</span>) ==</span><br><span class="line">  -<span class="literal">Infinity</span> - <span class="number">0</span> - <span class="number">0</span>) ==</span><br><span class="line">  <span class="number">-0</span> - <span class="number">0</span> + <span class="number">0</span>) ==</span><br><span class="line">  <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>减法操作符<ul>
+<li>如果两个操作数都是数值，则执行数学减法运算并返回结果</li>
+<li>如果有任一操作数是 NaN，则返回 NaN</li>
+<li>如果有任一操作数是字符串、布尔值、null 或 undefined，则先在后台使用 Number() 将其转换为数值，然后再根据前面的规则执行数学运算。如果转换结果是 NaN，则减法计算的结果是 NaN</li>
+<li>如果有任一操作数是对象，则调用其 valueOf() 方法取得表示它的数值。如果该值是 NaN，则减法计算的结果是 NaN。如果对象没有 valueOf()方法，则调用其 toString()方法，然后再将得到的字符串转换为数值</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="literal">Infinity</span> - <span class="literal">Infinity</span> == <span class="literal">NaN</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> result1 = <span class="number">5</span> - <span class="literal">true</span>; <span class="comment">// 4</span></span><br><span class="line"><span class="keyword">let</span> result2 = <span class="literal">NaN</span> - <span class="number">1</span>; <span class="comment">// NaN</span></span><br><span class="line"><span class="keyword">let</span> result3 = <span class="number">5</span> - <span class="number">3</span>; <span class="comment">// 2</span></span><br><span class="line"><span class="keyword">let</span> result4 = <span class="number">5</span> - <span class="string">""</span>; <span class="comment">// 5</span></span><br><span class="line"><span class="keyword">let</span> result5 = <span class="number">5</span> - <span class="string">"2"</span>; <span class="comment">// 3</span></span><br><span class="line"><span class="keyword">let</span> result6 = <span class="number">5</span> - <span class="literal">null</span>; <span class="comment">// 5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> obj1 = &#123;</span><br><span class="line">  v: <span class="number">3</span>,</span><br><span class="line">  valueOf() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">5</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line">obj1 + <span class="number">1</span> == <span class="number">6</span>;</span><br><span class="line">Obj1 - <span class="number">1</span> == <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> obj2 = &#123;</span><br><span class="line">  v: <span class="number">3</span>,</span><br><span class="line">  toString() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">5</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line">obj2 + <span class="number">1</span> == <span class="number">6</span>;</span><br><span class="line">Obj2 - <span class="number">1</span> == <span class="number">4</span>;</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>

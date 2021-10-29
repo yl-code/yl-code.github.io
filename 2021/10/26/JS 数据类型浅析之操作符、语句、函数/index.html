@@ -95,7 +95,7 @@
 <meta property="og:site_name" content="Yanglei&#39;s Blog">
 <meta property="og:description" content="操作符 ECMA-262 描述了一组可用于操作数据值的操作符，包括数学操作符（如加、减）、位操作符、关系操作符和相等操作符等 ECMAScript 中的操作符是独特的，因为它们可用于各种值，包括字符串、数值、布尔值，甚至还有对象 在应用给对象时，操作符通常会调用 valueOf() 或 toString() 方法来取得可以计算的值  ​ 一元操作符 递增&#x2F;递减操作符 操作数据值的规则 对于字符串">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-10-28T01:14:02.273Z">
+<meta property="og:updated_time" content="2021-10-29T01:08:46.427Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -355,7 +355,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.2k
+                  2.7k
                 </span>
               
 
@@ -371,7 +371,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  8
+                  10
                 </span>
               
             </div>
@@ -604,6 +604,34 @@
 </ul>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.pow(<span class="number">3</span>, <span class="number">2</span>); <span class="comment">// 9</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">3</span> ** <span class="number">2</span>); <span class="comment">// 9</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.pow(<span class="number">16</span>, <span class="number">0.5</span>); <span class="comment">// 4</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">16</span>** <span class="number">0.5</span>); <span class="comment">// 4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sqrt = <span class="number">16</span>;</span><br><span class="line">sqrt **= <span class="number">0.5</span>;</span><br><span class="line"><span class="built_in">console</span>.log(sqrt); <span class="comment">// 4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> squared = <span class="number">3</span>;</span><br><span class="line">squared **= <span class="number">2</span>;</span><br><span class="line"><span class="built_in">console</span>.log(squared); <span class="comment">// 9</span></span><br></pre></td></tr></table></figure>
 
+<h2 id="加性操作符"><a href="#加性操作符" class="headerlink" title="加性操作符"></a>加性操作符</h2><ul>
+<li>加性操作符，指的是加法和减法操作符，与乘性操作符类似，加性操作符在后台会发生不同数据类型的转换</li>
+</ul>
+<p>​</p>
+<ul>
+<li>加法操作符<ul>
+<li>如果有任一操作数是 NaN，则返回 NaN</li>
+<li>如果两个操作数都是字符串，则将第二个字符串拼接到第一个字符串后面，如果只有一个操作数是字符串，则将另一个操作数转换为字符串，再将两个字符串拼接在一起</li>
+<li>如果有任一操作数是对象、数值或布尔值，则调用它们的 toString() 方法以获取字符串，然后再应用前面的关于字符串的运算规则。<ul>
+<li>对于 undefined 和 null，则调用 String() 函数，分别获取 “undefined” 和 “null”</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-<span class="literal">Infinity</span> + <span class="literal">Infinity</span> == <span class="literal">NaN</span>;</span><br><span class="line">(((<span class="literal">Infinity</span> + <span class="literal">Infinity</span> == <span class="literal">Infinity</span> - <span class="literal">Infinity</span> - <span class="literal">Infinity</span>) ==</span><br><span class="line">  -<span class="literal">Infinity</span> - <span class="number">0</span> - <span class="number">0</span>) ==</span><br><span class="line">  <span class="number">-0</span> - <span class="number">0</span> + <span class="number">0</span>) ==</span><br><span class="line">  <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>减法操作符<ul>
+<li>如果两个操作数都是数值，则执行数学减法运算并返回结果</li>
+<li>如果有任一操作数是 NaN，则返回 NaN</li>
+<li>如果有任一操作数是字符串、布尔值、null 或 undefined，则先在后台使用 Number() 将其转换为数值，然后再根据前面的规则执行数学运算。如果转换结果是 NaN，则减法计算的结果是 NaN</li>
+<li>如果有任一操作数是对象，则调用其 valueOf() 方法取得表示它的数值。如果该值是 NaN，则减法计算的结果是 NaN。如果对象没有 valueOf()方法，则调用其 toString()方法，然后再将得到的字符串转换为数值</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">Infinity</span> - <span class="literal">Infinity</span> == <span class="literal">NaN</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> result1 = <span class="number">5</span> - <span class="literal">true</span>; <span class="comment">// 4</span></span><br><span class="line"><span class="keyword">let</span> result2 = <span class="literal">NaN</span> - <span class="number">1</span>; <span class="comment">// NaN</span></span><br><span class="line"><span class="keyword">let</span> result3 = <span class="number">5</span> - <span class="number">3</span>; <span class="comment">// 2</span></span><br><span class="line"><span class="keyword">let</span> result4 = <span class="number">5</span> - <span class="string">""</span>; <span class="comment">// 5</span></span><br><span class="line"><span class="keyword">let</span> result5 = <span class="number">5</span> - <span class="string">"2"</span>; <span class="comment">// 3</span></span><br><span class="line"><span class="keyword">let</span> result6 = <span class="number">5</span> - <span class="literal">null</span>; <span class="comment">// 5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> obj1 = &#123;</span><br><span class="line">  v: <span class="number">3</span>,</span><br><span class="line">  valueOf() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">5</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line">obj1 + <span class="number">1</span> == <span class="number">6</span>;</span><br><span class="line">Obj1 - <span class="number">1</span> == <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> obj2 = &#123;</span><br><span class="line">  v: <span class="number">3</span>,</span><br><span class="line">  toString() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">5</span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br><span class="line">obj2 + <span class="number">1</span> == <span class="number">6</span>;</span><br><span class="line">Obj2 - <span class="number">1</span> == <span class="number">4</span>;</span><br></pre></td></tr></table></figure>
+
       
     </div>
     
@@ -829,7 +857,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#操作符"><span class="nav-number">1.</span> <span class="nav-text">操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一元操作符"><span class="nav-number">1.1.</span> <span class="nav-text">一元操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位操作符"><span class="nav-number">1.2.</span> <span class="nav-text">位操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#布尔操作符"><span class="nav-number">1.3.</span> <span class="nav-text">布尔操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#乘性操作符"><span class="nav-number">1.4.</span> <span class="nav-text">乘性操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指数操作符"><span class="nav-number">1.5.</span> <span class="nav-text">指数操作符</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#操作符"><span class="nav-number">1.</span> <span class="nav-text">操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一元操作符"><span class="nav-number">1.1.</span> <span class="nav-text">一元操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位操作符"><span class="nav-number">1.2.</span> <span class="nav-text">位操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#布尔操作符"><span class="nav-number">1.3.</span> <span class="nav-text">布尔操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#乘性操作符"><span class="nav-number">1.4.</span> <span class="nav-text">乘性操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指数操作符"><span class="nav-number">1.5.</span> <span class="nav-text">指数操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加性操作符"><span class="nav-number">1.6.</span> <span class="nav-text">加性操作符</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -865,7 +893,7 @@
     
       <span class="post-meta-item-text">站点总字数&#58;</span>
     
-    <span title="站点总字数">12.2k</span>
+    <span title="站点总字数">12.7k</span>
 
 <span class="post-meta-divider">|</span>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
