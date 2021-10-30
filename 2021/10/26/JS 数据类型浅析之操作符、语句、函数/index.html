@@ -95,7 +95,7 @@
 <meta property="og:site_name" content="Yanglei&#39;s Blog">
 <meta property="og:description" content="操作符 ECMA-262 描述了一组可用于操作数据值的操作符，包括数学操作符（如加、减）、位操作符、关系操作符和相等操作符等 ECMAScript 中的操作符是独特的，因为它们可用于各种值，包括字符串、数值、布尔值，甚至还有对象 在应用给对象时，操作符通常会调用 valueOf() 或 toString() 方法来取得可以计算的值  ​ 一元操作符 递增&#x2F;递减操作符 操作数据值的规则 对于字符串">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-10-30T04:30:23.852Z">
+<meta property="og:updated_time" content="2021-10-30T15:57:10.972Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -355,7 +355,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  3.9k
+                  4.3k
                 </span>
               
 
@@ -371,7 +371,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  15
+                  17
                 </span>
               
             </div>
@@ -713,12 +713,34 @@
 </ul>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 打印 斐波那契数列</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">fibonacci</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 一个生成器函数</span></span><br><span class="line">  <span class="keyword">let</span> [prev, curr] = [<span class="number">0</span>, <span class="number">1</span>];</span><br><span class="line">  <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">    <span class="comment">// while (true) &#123;</span></span><br><span class="line">    [prev, curr] = [curr, prev + curr];</span><br><span class="line">    <span class="keyword">yield</span> curr;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> n <span class="keyword">of</span> fibonacci()) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(n);</span><br><span class="line">  <span class="comment">// 当n大于1000时跳出循环</span></span><br><span class="line">  <span class="keyword">if</span> (n &gt;= <span class="number">1000</span>) <span class="keyword">break</span>; <span class="comment">// 关闭生成器</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h2 id="标签语句"><a href="#标签语句" class="headerlink" title="标签语句"></a><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/label" target="_blank" rel="noopener">标签语句</a></h2><ul>
-<li>标记语句可以和 break 或 continue 语句一起使用。标记就是在一条语句前面加个可以引用的标识符（identifier）</li>
+<h2 id="标签语句-amp-break-amp-continue"><a href="#标签语句-amp-break-amp-continue" class="headerlink" title="标签语句 &amp; break &amp; continue"></a><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/label" target="_blank" rel="noopener">标签语句</a> &amp; break &amp; continue</h2><ul>
+<li>标记语句可以和 <code>break</code> 或 <code>continue</code> 语句一起使用</li>
+<li>标记就是在一条语句前面加个可以引用的标识符（identifier）</li>
+<li>在 for 循环中，break 会跳出整个循环，continue 会跳过当次循环</li>
 </ul>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j;</span><br><span class="line"></span><br><span class="line">loop1: <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">  <span class="comment">//The first for statement is labeled "loop1"</span></span><br><span class="line">  loop2: <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; <span class="number">3</span>; j++) &#123;</span><br><span class="line">    <span class="comment">//The second for statement is labeled "loop2"</span></span><br><span class="line">    <span class="keyword">if</span> (i == <span class="number">1</span> &amp;&amp; j == <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="keyword">break</span> loop1;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"i = "</span> + i + <span class="string">", j = "</span> + j);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output is:</span></span><br><span class="line"><span class="comment">//   "i = 0, j = 0"</span></span><br><span class="line"><span class="comment">//   "i = 0, j = 1"</span></span><br><span class="line"><span class="comment">//   "i = 0, j = 2"</span></span><br><span class="line"><span class="comment">//   "i = 1, j = 0"</span></span><br><span class="line"><span class="comment">// Notice the difference with the previous continue example</span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j;</span><br><span class="line"></span><br><span class="line">loop1: <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">  <span class="comment">//The first for statement is labeled "loop1"</span></span><br><span class="line">  loop2: <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; <span class="number">3</span>; j++) &#123;</span><br><span class="line">    <span class="comment">//The second for statement is labeled "loop2"</span></span><br><span class="line">    <span class="keyword">if</span> (i === <span class="number">1</span> &amp;&amp; j === <span class="number">1</span>) &#123;</span><br><span class="line">      <span class="keyword">continue</span> loop1;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"i = "</span> + i + <span class="string">", j = "</span> + j);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output is:</span></span><br><span class="line"><span class="comment">//   "i = 0, j = 0"</span></span><br><span class="line"><span class="comment">//   "i = 0, j = 1"</span></span><br><span class="line"><span class="comment">//   "i = 0, j = 2"</span></span><br><span class="line"><span class="comment">//   "i = 1, j = 0"</span></span><br><span class="line"><span class="comment">//   "i = 2, j = 0"</span></span><br><span class="line"><span class="comment">//   "i = 2, j = 1"</span></span><br><span class="line"><span class="comment">//   "i = 2, j = 2"</span></span><br><span class="line"><span class="comment">// Notice how it skips both "i = 1, j = 1" and "i = 1, j = 2"</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><ul>
+<li>JavaScript 的核心语言特性在 ECMA-262 中以伪语言 ECMAScript 的形式来定义</li>
+<li>ECMAScript 包含所有基本语法、操作符、数据类型和对象，能完成基本的计算任务，但没有提供获得输入和产生输出的机制</li>
+<li>理解 ECMAScript 及其复杂的细节是完全理解浏览器中 JavaScript 的关键</li>
+<li>下面总结一下 ECMAScript 中的基本元素<ul>
+<li>ECMAScript 中的基本数据类型包括 Undefined、Null、Boolean、Number、String 和 Symbol</li>
+<li>与其他语言不同，ECMAScript 不区分整数和浮点值，只有 Number 一种数值数据类型</li>
+<li>Object 是一种复杂数据类型，它是这门语言中所有对象的基类</li>
+<li>严格模式为这门语言中某些容易出错的部分施加了限制</li>
+<li>ECMAScript 提供了 C 语言和类 C 语言中常见的很多基本操作符，包括数学操作符、布尔操作符、关系操作符、相等操作符和赋值操作符等</li>
+<li>这门语言中的流控制语句大多是从其他语言中借鉴而来的，比如 if 语句、for 语句和 switch 语句等</li>
+<li>ECMAScript 中的函数与其他语言中的函数不一样<ul>
+<li>不需要指定函数的返回值，因为任何函数可以在任何时候返回任何值</li>
+<li>不指定返回值的函数实际上会返回特殊值 undefined</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
       
     </div>
@@ -945,7 +967,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#操作符"><span class="nav-number">1.</span> <span class="nav-text">操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一元操作符"><span class="nav-number">1.1.</span> <span class="nav-text">一元操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位操作符"><span class="nav-number">1.2.</span> <span class="nav-text">位操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#布尔操作符"><span class="nav-number">1.3.</span> <span class="nav-text">布尔操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#乘性操作符"><span class="nav-number">1.4.</span> <span class="nav-text">乘性操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指数操作符"><span class="nav-number">1.5.</span> <span class="nav-text">指数操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加性操作符"><span class="nav-number">1.6.</span> <span class="nav-text">加性操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关系操作符"><span class="nav-number">1.7.</span> <span class="nav-text">关系操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相等操作符"><span class="nav-number">1.8.</span> <span class="nav-text">相等操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#赋值操作符"><span class="nav-number">1.9.</span> <span class="nav-text">赋值操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逗号操作符"><span class="nav-number">1.10.</span> <span class="nav-text">逗号操作符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#语句"><span class="nav-number">2.</span> <span class="nav-text">语句</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#for-in-语句"><span class="nav-number">2.1.</span> <span class="nav-text">for-in 语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#for-of-语句"><span class="nav-number">2.2.</span> <span class="nav-text">for-of 语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标签语句"><span class="nav-number">2.3.</span> <span class="nav-text">标签语句</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#操作符"><span class="nav-number">1.</span> <span class="nav-text">操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一元操作符"><span class="nav-number">1.1.</span> <span class="nav-text">一元操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位操作符"><span class="nav-number">1.2.</span> <span class="nav-text">位操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#布尔操作符"><span class="nav-number">1.3.</span> <span class="nav-text">布尔操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#乘性操作符"><span class="nav-number">1.4.</span> <span class="nav-text">乘性操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指数操作符"><span class="nav-number">1.5.</span> <span class="nav-text">指数操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加性操作符"><span class="nav-number">1.6.</span> <span class="nav-text">加性操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关系操作符"><span class="nav-number">1.7.</span> <span class="nav-text">关系操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相等操作符"><span class="nav-number">1.8.</span> <span class="nav-text">相等操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#赋值操作符"><span class="nav-number">1.9.</span> <span class="nav-text">赋值操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逗号操作符"><span class="nav-number">1.10.</span> <span class="nav-text">逗号操作符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#语句"><span class="nav-number">2.</span> <span class="nav-text">语句</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#for-in-语句"><span class="nav-number">2.1.</span> <span class="nav-text">for-in 语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#for-of-语句"><span class="nav-number">2.2.</span> <span class="nav-text">for-of 语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标签语句-amp-break-amp-continue"><span class="nav-number">2.3.</span> <span class="nav-text">标签语句 &amp; break &amp; continue</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">3.</span> <span class="nav-text">小结</span></a></li></ol></div>
             
 
           </div>
@@ -981,7 +1003,7 @@
     
       <span class="post-meta-item-text">站点总字数&#58;</span>
     
-    <span title="站点总字数">13.9k</span>
+    <span title="站点总字数">14.3k</span>
 
 <span class="post-meta-divider">|</span>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
