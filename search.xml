@@ -355,8 +355,8 @@
 ]]></content>
   </entry>
   <entry>
-    <title>JS 数据类型浅析之 String、Symbol、Object</title>
-    <url>/2021/10/24/JS%20%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%B5%85%E6%9E%90%E4%B9%8B%20String%E3%80%81Symbol%E3%80%81Object/</url>
+    <title>JS 语言基础之 String、Symbol、Object</title>
+    <url>/2021/10/24/JS%20%E8%AF%AD%E8%A8%80%E5%9F%BA%E7%A1%80%E4%B9%8B%20String%E3%80%81Symbol%E3%80%81Object/</url>
     <content><![CDATA[<h1 id="String-类型"><a href="#String-类型" class="headerlink" title="String 类型"></a>String 类型</h1><h2 id="字符串转换"><a href="#字符串转换" class="headerlink" title="字符串转换"></a>字符串转换</h2><ul>
 <li><code>toString()</code> 方法可见于数值、布尔值、对象和字符串值，这个方法的唯一用途就是返回当前值的字符串等价物<ul>
 <li>null 和 undefined 值没有 toString() 方法</li>
