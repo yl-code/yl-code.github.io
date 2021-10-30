@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>JS 数据类型浅析之操作符、语句、函数</title>
-    <url>/2021/10/26/JS%20%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%B5%85%E6%9E%90%E4%B9%8B%E6%93%8D%E4%BD%9C%E7%AC%A6%E3%80%81%E8%AF%AD%E5%8F%A5%E3%80%81%E5%87%BD%E6%95%B0/</url>
+    <title>JS 语言基础之操作符与语句</title>
+    <url>/2021/10/26/JS%20%E8%AF%AD%E8%A8%80%E5%9F%BA%E7%A1%80%E4%B9%8B%E6%93%8D%E4%BD%9C%E7%AC%A6%E4%B8%8E%E8%AF%AD%E5%8F%A5/</url>
     <content><![CDATA[<h1 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h1><ul>
 <li>ECMA-262 描述了一组可用于操作数据值的操作符，包括数学操作符（如加、减）、位操作符、关系操作符和相等操作符等</li>
 <li>ECMAScript 中的操作符是独特的，因为它们可用于各种值，包括字符串、数值、布尔值，甚至还有对象</li>
