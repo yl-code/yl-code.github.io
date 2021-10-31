@@ -1,6 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>变量、作用域与内存</title>
+    <url>/2021/10/31/%E5%8F%98%E9%87%8F%E3%80%81%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8E%E5%86%85%E5%AD%98/</url>
+    <content><![CDATA[<ul>
+<li>ECMA-262 所规定的，JavaScript 变量是松散类型的，而且变量不过就是特定时间点一个特定值的名称而已</li>
+<li>由于没有规则定义变量必须包含什么数据类型，变量的值和数据类型在脚本生命期内可以改变</li>
+</ul>
+<p>​</p>
+<h1 id="原始值与引用值"><a href="#原始值与引用值" class="headerlink" title="原始值与引用值"></a>原始值与引用值</h1><ul>
+<li>ECMAScript 变量可以包含两种不同类型的数据：原始值和引用值，在把一个值赋给变量时，JavaScript 引擎必须确定这个值是原始值还是引用值</li>
+<li>原始值（<code>primitive value</code>）就是最简单的数据<ul>
+<li>包括 Undefined、Null、Boolean、Number、String 和 Symbol 等类型</li>
+<li>保存原始值的变量是按值（<code>by value</code>）访问的，因此我们操作的就是存储在变量中的实际值</li>
+</ul>
+</li>
+<li>引用值（<code>reference value</code>）则是由多个值构成的对象<ul>
+<li>由于 JavaScript 不允许直接访问内存位置，因此也就不能直接操作对象所在的内存空间</li>
+<li>在操作对象时，实际上操作的是对该对象的引用（reference）而非实际的对象本身</li>
+<li>为此，保存引用值的变量是按引用（<code>by reference</code>）访问的</li>
+</ul>
+</li>
+</ul>
+<p>​</p>
+<h2 id="​-复制值"><a href="#​-复制值" class="headerlink" title="​ 复制值"></a>​ 复制值</h2><ul>
+<li><p>除了存储方式不同，原始值和引用值在通过变量复制时也有所不同</p>
+</li>
+<li><p>原始值</p>
+<ul>
+<li><p>在通过变量把一个原始值赋值到另一个变量时，原始值会被复制到新变量的位置，这两个值完全独立，互不干扰</p>
+</li>
+<li><p>复制前的变量 num1</p>
+<table>
+<thead>
+<tr>
+<th>num1</th>
+<th>5 (Number 类型)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+</li>
+<li><p>复制一份变量 num2</p>
+<table>
+<thead>
+<tr>
+<th>num1</th>
+<th>5 (Number 类型)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>num2</td>
+<td>5 (Number 类型)</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+</li>
+<li><p>引用值</p>
+<ul>
+<li>在把引用值从一个变量赋给另一个变量时，存储在变量中的值也会被复制到新变量所在的位置</li>
+<li>不同与原始值复制的是，这里复制的值实际上是一个指针，它指向存储在堆内存中的对象</li>
+<li>操作完成后，两个变量实际上指向同一个对象，因此一个对象上面的变化会在另一个对象上反映出来</li>
+</ul>
+</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
     <title>JS 语言基础之操作符与语句</title>
     <url>/2021/10/26/JS%20%E8%AF%AD%E8%A8%80%E5%9F%BA%E7%A1%80%E4%B9%8B%E6%93%8D%E4%BD%9C%E7%AC%A6%E4%B8%8E%E8%AF%AD%E5%8F%A5/</url>
     <content><![CDATA[<h1 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h1><ul>
