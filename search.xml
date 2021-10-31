@@ -68,6 +68,30 @@
 </ul>
 </li>
 </ul>
+<h2 id="传递参数"><a href="#传递参数" class="headerlink" title="传递参数"></a>传递参数</h2><ul>
+<li>ECMAScript 中所有函数的参数是局部变量，且都是按值传递的，这意味着函数外的值会被复制到函数内部的参数中，这与上面讲的 复制值 是一样的</li>
+<li>在按引用传递参数时，值在内存中的位置会被保存在一个局部变量，这意味着对本地变量的修改会反映到函数外部</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 传递原始值</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addTen</span>(<span class="params">num</span>) </span>&#123;</span><br><span class="line">  num += <span class="number">10</span>;</span><br><span class="line">  <span class="keyword">return</span> num;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> count = <span class="number">20</span>;</span><br><span class="line"><span class="keyword">let</span> result = addTen(count);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(count); <span class="comment">// 20，没有变化</span></span><br><span class="line"><span class="built_in">console</span>.log(result); <span class="comment">// 30</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 传递引用类型的值</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setName</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  obj.name = <span class="string">"Nicholas"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> person = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line">setName(person);</span><br><span class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">// "Nicholas"</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>下面的代码更加能证明函数传参是传值的<ul>
+<li>如果 person 是按引用传递的，那么 person 应该自动将指针改为指向 name 为 “after” 的对象，但是最后访问 person.name 时，它的值是 “before”</li>
+<li>这表明函数中参数的值改变之后，原始的引用仍然没变。当 obj 在函数内部被重写时，它变成了一个指向本地对象的指针，且在函数执行结束时本地对象会被销毁</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">setName</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  obj.name = <span class="string">"before"</span>;</span><br><span class="line">  obj = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line">  obj.name = <span class="string">"after"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> person = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line">setName(person);</span><br><span class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">// "before"</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="确定类型"><a href="#确定类型" class="headerlink" title="确定类型"></a>确定类型</h2><ul>
+<li>typeof 操作符最适合用来判断一个变量是否为原始类型，更确切地说，它是判断一个变量是否为字符串、数值、布尔值或 undefined 的最好方式</li>
+<li>但对引用类型来说，用处并不大，typeof 对 对象或 null 的值都是 “object”，为了解决这个问题，ECMAScript 提供了 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/instanceof" target="_blank" rel="noopener">instanceof</a> 操作符<ul>
+<li>按照定义，所有引用值都是 Object 的实例，因此通过 instanceof 操作符检测任何引用值和 Object 构造函数都会返回 true</li>
+<li>但如果用 instanceof 检测原始值，则始终会返回 false，因为原始值不是对象</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="string">"str"</span>;</span><br><span class="line">a <span class="keyword">instanceof</span> <span class="built_in">String</span>; <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> b = <span class="keyword">new</span> <span class="built_in">String</span>();</span><br><span class="line">b <span class="keyword">instanceof</span> <span class="built_in">String</span>; <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">b <span class="keyword">instanceof</span> <span class="built_in">Object</span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
