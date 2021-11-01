@@ -64,8 +64,7 @@
 </ul>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="string">"str"</span>;</span><br><span class="line">a <span class="keyword">instanceof</span> <span class="built_in">String</span>; <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> b = <span class="keyword">new</span> <span class="built_in">String</span>();</span><br><span class="line">b <span class="keyword">instanceof</span> <span class="built_in">String</span>; <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">b <span class="keyword">instanceof</span> <span class="built_in">Object</span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="执行上下文与作用域"><a href="#执行上下文与作用域" class="headerlink" title="执行上下文与作用域"></a>执行上下文与作用域</h2><ul>
-<li>上下文<ul>
+<h1 id="执行上下文与作用域"><a href="#执行上下文与作用域" class="headerlink" title="执行上下文与作用域"></a>执行上下文与作用域</h1><h2 id="上下文"><a href="#上下文" class="headerlink" title="上下文"></a>上下文</h2><ul>
 <li>执行上下文（简称“上下文”）决定了变量和函数可以访问哪些数据，以及它们的行为<ul>
 <li>每个上下文都有一个关联的变量对象（variable object），而这个上下文中定义的所有变量和函数都存在于这个对象上</li>
 <li>虽然无法通过代码访问变量对象，但后台处理数据会用到它</li>
@@ -87,11 +86,8 @@
 </ul>
 </li>
 </ul>
-</li>
-</ul>
 <p>​</p>
-<ul>
-<li>作用域链<ul>
+<h2 id="作用域链"><a href="#作用域链" class="headerlink" title="作用域链"></a>作用域链</h2><ul>
 <li>上下文中的代码在执行的时候，会创建变量对象的一个作用域链（scope chain）<ul>
 <li>这个作用域链决定了各级上下文中的代码在访问变量和函数时的顺序</li>
 <li>代码正在执行的上下文的变量对象始终位于作用域链的最前端</li>
@@ -100,16 +96,11 @@
 <li>如果上下文是函数，则其活动对象（activation object）用作变量对象，活动对象最初只有一个定义变量：arguments。全局上下文中没有这个变量。</li>
 <li>作用域链中的下一个变量对象来自包含上下文，再下一个对象来自再下一个包含上下文。以此类推直至全局上下文，因此全局上下文的变量对象始终是作用域链的最后一个变量对象</li>
 </ul>
-</li>
-</ul>
 <p>​</p>
-<ul>
-<li>查找作用域链<ul>
+<h2 id="查找作用域链"><a href="#查找作用域链" class="headerlink" title="查找作用域链"></a>查找作用域链</h2><ul>
 <li>代码执行时的标识符解析是通过沿作用域链逐级搜索标识符名称完成的</li>
 <li>搜索过程始终从作用域链的最前端开始，然后逐级往后，直到找到标识符</li>
 <li>如果没有找到标识符，那么通常会报错</li>
-</ul>
-</li>
 </ul>
 <p>​</p>
 <ul>
