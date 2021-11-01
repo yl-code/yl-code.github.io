@@ -95,7 +95,7 @@
 <meta property="og:site_name" content="Yanglei&#39;s Blog">
 <meta property="og:description" content="ECMA-262 所规定的，JavaScript 变量是松散类型的，而且变量不过就是特定时间点一个特定值的名称而已 由于没有规则定义变量必须包含什么数据类型，变量的值和数据类型在脚本生命期内可以改变  ​ 原始值与引用值 ECMAScript 变量可以包含两种不同类型的数据：原始值和引用值，在把一个值赋给变量时，JavaScript 引擎必须确定这个值是原始值还是引用值 原始值（primitiv">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-10-31T11:24:31.380Z">
+<meta property="og:updated_time" content="2021-11-01T01:06:30.769Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -355,7 +355,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1k
+                  1.8k
                 </span>
               
 
@@ -371,7 +371,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  3
+                  6
                 </span>
               
             </div>
@@ -413,44 +413,15 @@
 </ul>
 <p>​</p>
 <h2 id="​-复制值"><a href="#​-复制值" class="headerlink" title="​ 复制值"></a>​ 复制值</h2><ul>
-<li><p>除了存储方式不同，原始值和引用值在通过变量复制时也有所不同</p>
-</li>
-<li><p>原始值</p>
-<ul>
-<li><p>在通过变量把一个原始值赋值到另一个变量时，原始值会被复制到新变量的位置，这两个值完全独立，互不干扰</p>
-</li>
-<li><p>复制前的变量 num1</p>
-<table>
-<thead>
-<tr>
-<th>num1</th>
-<th>5 (Number 类型)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-</li>
-<li><p>复制一份变量 num2</p>
-<table>
-<thead>
-<tr>
-<th>num1</th>
-<th>5 (Number 类型)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>num2</td>
-<td>5 (Number 类型)</td>
-</tr>
-</tbody></table>
-</li>
+<li>除了存储方式不同，原始值和引用值在通过变量复制时也有所不同</li>
+<li>原始值<ul>
+<li>在通过变量把一个原始值赋值到另一个变量时，原始值会被复制到新变量的位置，这两个值完全独立，互不干扰</li>
 </ul>
 </li>
-<li><p>引用值</p>
+</ul>
+<p>​</p>
 <ul>
+<li>引用值<ul>
 <li>在把引用值从一个变量赋给另一个变量时，存储在变量中的值也会被复制到新变量所在的位置</li>
 <li>不同与原始值复制的是，这里复制的值实际上是一个指针，它指向存储在堆内存中的对象</li>
 <li>操作完成后，两个变量实际上指向同一个对象，因此一个对象上面的变化会在另一个对象上反映出来</li>
@@ -481,6 +452,60 @@
 </li>
 </ul>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="string">"str"</span>;</span><br><span class="line">a <span class="keyword">instanceof</span> <span class="built_in">String</span>; <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> b = <span class="keyword">new</span> <span class="built_in">String</span>();</span><br><span class="line">b <span class="keyword">instanceof</span> <span class="built_in">String</span>; <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line">b <span class="keyword">instanceof</span> <span class="built_in">Object</span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="执行上下文与作用域"><a href="#执行上下文与作用域" class="headerlink" title="执行上下文与作用域"></a>执行上下文与作用域</h2><ul>
+<li>上下文<ul>
+<li>执行上下文（简称“上下文”）决定了变量和函数可以访问哪些数据，以及它们的行为<ul>
+<li>每个上下文都有一个关联的变量对象（variable object），而这个上下文中定义的所有变量和函数都存在于这个对象上</li>
+<li>虽然无法通过代码访问变量对象，但后台处理数据会用到它</li>
+</ul>
+</li>
+<li>全局上下文是最外层的上下文<ul>
+<li>根据 ECMAScript 实现的宿主环境，表示全局上下文的对象可能不一样</li>
+<li>在浏览器中，全局上下文就是 window 对象，因此所有通过 var 定义的全局变量和函数都会成为 window 对象的属性和方法，使用 let 和 const 的顶级声明不会定义在全局上下文中</li>
+</ul>
+</li>
+<li>上下文在其所有代码都执行完毕后会被销毁，包括定义在它上面的所有变量和函数<ul>
+<li>全局上下文在应用程序退出前才会被销毁，比如关闭网页或退出浏览器</li>
+</ul>
+</li>
+<li>每个函数调用都有自己的上下文<ul>
+<li>当代码执行流进入函数时，函数的上下文被推到一个上下文栈上</li>
+<li>在函数执行完之后，上下文栈会弹出该函数上下文，将控制权返还给之前的执行上下文</li>
+<li>ECMAScript 程序的执行流就是通过这个上下文栈进行控制的</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>​</p>
+<ul>
+<li>作用域链<ul>
+<li>上下文中的代码在执行的时候，会创建变量对象的一个作用域链（scope chain）<ul>
+<li>这个作用域链决定了各级上下文中的代码在访问变量和函数时的顺序</li>
+<li>代码正在执行的上下文的变量对象始终位于作用域链的最前端</li>
+</ul>
+</li>
+<li>如果上下文是函数，则其活动对象（activation object）用作变量对象，活动对象最初只有一个定义变量：arguments。全局上下文中没有这个变量。</li>
+<li>作用域链中的下一个变量对象来自包含上下文，再下一个对象来自再下一个包含上下文。以此类推直至全局上下文，因此全局上下文的变量对象始终是作用域链的最后一个变量对象</li>
+</ul>
+</li>
+</ul>
+<p>​</p>
+<ul>
+<li>查找作用域链<ul>
+<li>代码执行时的标识符解析是通过沿作用域链逐级搜索标识符名称完成的</li>
+<li>搜索过程始终从作用域链的最前端开始，然后逐级往后，直到找到标识符</li>
+<li>如果没有找到标识符，那么通常会报错</li>
+</ul>
+</li>
+</ul>
+<p>​</p>
+<ul>
+<li>作用域链上内部的上下文可以通过作用域链访问外部的上下文中的一切，但外部的上下文无法访问内部的上下文中的任何东西</li>
+<li>上下文之间的连接是线性的、有序的。每个上下文都可以到上一级上下文中去搜索变量和函数，但任何上下文都不能到下一级上下文中去搜索</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> color = <span class="string">"blue"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">changeColor</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> anotherColor = <span class="string">"red"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">swapColors</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> tempColor = anotherColor;</span><br><span class="line">    anotherColor = color;</span><br><span class="line">    color = tempColor;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里可以访问 color、anotherColor 和 tempColor</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 这里可以访问 color 和 anotherColor，但访问不到 tempColor</span></span><br><span class="line">  swapColors();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里只能访问 color</span></span><br><span class="line">changeColor();</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -707,7 +732,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#原始值与引用值"><span class="nav-number">1.</span> <span class="nav-text">原始值与引用值</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#​-复制值"><span class="nav-number">1.1.</span> <span class="nav-text">​ 复制值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传递参数"><span class="nav-number">1.2.</span> <span class="nav-text">传递参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#确定类型"><span class="nav-number">1.3.</span> <span class="nav-text">确定类型</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#原始值与引用值"><span class="nav-number">1.</span> <span class="nav-text">原始值与引用值</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#​-复制值"><span class="nav-number">1.1.</span> <span class="nav-text">​ 复制值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传递参数"><span class="nav-number">1.2.</span> <span class="nav-text">传递参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#确定类型"><span class="nav-number">1.3.</span> <span class="nav-text">确定类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#执行上下文与作用域"><span class="nav-number">1.4.</span> <span class="nav-text">执行上下文与作用域</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -743,7 +768,7 @@
     
       <span class="post-meta-item-text">站点总字数&#58;</span>
     
-    <span title="站点总字数">15.3k</span>
+    <span title="站点总字数">16.2k</span>
 
 <span class="post-meta-divider">|</span>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
