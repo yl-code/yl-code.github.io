@@ -108,7 +108,63 @@
 <li>上下文之间的连接是线性的、有序的。每个上下文都可以到上一级上下文中去搜索变量和函数，但任何上下文都不能到下一级上下文中去搜索</li>
 </ul>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> color = <span class="string">"blue"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">changeColor</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> anotherColor = <span class="string">"red"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">swapColors</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> tempColor = anotherColor;</span><br><span class="line">    anotherColor = color;</span><br><span class="line">    color = tempColor;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里可以访问 color、anotherColor 和 tempColor</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 这里可以访问 color 和 anotherColor，但访问不到 tempColor</span></span><br><span class="line">  swapColors();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里只能访问 color</span></span><br><span class="line">changeColor();</span><br></pre></td></tr></table></figure>
-]]></content>
+
+<h2 id="作用域链增强"><a href="#作用域链增强" class="headerlink" title="作用域链增强"></a>作用域链增强</h2><ul>
+<li>虽然 <code>执行上下文</code> 主要有 <code>全局上下文</code> 和 <code>函数上下文</code> 两种（eval()调用内部存在第三种上下文），但有其他方式来增强作用域链。</li>
+<li>某些语句会导致在作用域链前端临时添加一个上下文，这个上下文在代码执行后会被删除。通常在两种情况下会出现这个现象，即代码执行到下面任意一种情况时：<ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/try...catch" target="_blank" rel="noopener">try/catch 语句的 catch 块</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/with" target="_blank" rel="noopener">with 语句</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="变量声明"><a href="#变量声明" class="headerlink" title="变量声明"></a>变量声明</h2><ul>
+<li><p>使用 var 的函数作用域声明</p>
+<ul>
+<li>在使用 var 声明变量时，变量会被自动添加到最接近的上下文<ul>
+<li>在函数中，最接近的上下文就是函数的局部上下文</li>
+<li>在 with 语句中，最接近的上下文也是函数上下文</li>
+<li>如果变量未经声明就被初始化了，那么它就会自动被添加到全局上下文</li>
+</ul>
+</li>
+<li>var 声明的变量会被提升，即允许在声明的变量之前使用该变量</li>
+</ul>
+</li>
+<li><p>使用 let 的块级作用域声明</p>
+<ul>
+<li>ES6 新增的 let 关键字跟 var 很相似，但它的作用域是块级的<ul>
+<li>块级作用域由最近的一对包含花括号 {} 界定，换句话说，if 块、while 块、function 块，甚至连单独的 <code>{}</code> 块也是 let 声明变量的作用域</li>
+</ul>
+</li>
+<li>let 与 var 的另一个不同之处是在同一作用域内不能声明两次</li>
+<li>严格来讲，let 在 JavaScript 运行时中也会被提升，但由于 “暂时性死区”（temporal dead zone）的缘故，实际上不能在声明之前使用 let 变量。因此，从写 JavaScript 代码的角度说，let 的提升跟 var 是不一样的</li>
+</ul>
+</li>
+<li><p>使用 const 的常量声明</p>
+<ul>
+<li>使用 const 声明的变量必须同时初始化为某个值，且一经声明，在其生命周期的任何时候都不能再重新赋予新值</li>
+<li>const 声明只应用到顶级原语或者对象<ul>
+<li>换句话说，赋值为对象的 const 变量不能再被重新赋值为其他引用值，但对象的键则不受限制</li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze" target="_blank" rel="noopener">Object.freeze()</a> 可以解决这个问题</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="标识符查找"><a href="#标识符查找" class="headerlink" title="标识符查找"></a>标识符查找</h2><ul>
+<li>当在特定上下文中为读取或写入而引用一个标识符时，必须通过搜索确定这个标识符表示什么</li>
+<li>搜索开始于作用域链前端，以给定的名称搜索对应的标识符<ul>
+<li>如果在局部上下文中找到该标识符，则搜索停止，变量确定</li>
+<li>如果没有找到变量名，则继续沿作用域链搜索<ul>
+<li>注意，作用域链中的对象也有一个原型链，因此搜索可能涉及每个对象的原型链</li>
+</ul>
+</li>
+<li>这个过程一直持续到搜索至全局上下文的变量对象，如果仍然没有找到标识符，则说明其未声明。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> color = <span class="string">"blue"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getColor</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> color = <span class="string">"red"</span>;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">let</span> color = <span class="string">"green"</span>;</span><br><span class="line">    <span class="keyword">return</span> color;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(getColor()); <span class="comment">// 'green'</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h1>]]></content>
   </entry>
   <entry>
     <title>JS 语言基础之操作符与语句</title>
