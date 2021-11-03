@@ -164,7 +164,65 @@
 </ul>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> color = <span class="string">"blue"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getColor</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> color = <span class="string">"red"</span>;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">let</span> color = <span class="string">"green"</span>;</span><br><span class="line">    <span class="keyword">return</span> color;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(getColor()); <span class="comment">// 'green'</span></span><br></pre></td></tr></table></figure>
 
-<h1 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h1>]]></content>
+<h1 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h1><ul>
+<li>JavaScript 是使用垃圾回收的语言，执行环境负责在代码执行时管理内存<ul>
+<li>在 c/c++ 中需要开发者自己去跟踪内存使用</li>
+<li>而 JavaScript 为开发者卸下了这个负担，通过自动内存管理，实现内存分配和闲置资源的回收</li>
+</ul>
+</li>
+<li>垃圾回收的基本思路：<ul>
+<li>确定哪个变量不会再使用，然后释放它占用的内存</li>
+<li>这个过程是周期性的，即垃圾回收程序每隔一定时间（或者说在代码执行过程中某个预定的收集时间）就会自动运行</li>
+</ul>
+</li>
+<li>垃圾回收程序必须跟踪记录哪个变量还会使用，以及哪个变量不会再使用，以便回收内存。如何标记未使用的变量也许有不同的实现方式，在浏览器的发展史上，用到过两种主要的标记策略：<code>标记清理</code> 和 <code>引用计数</code></li>
+</ul>
+<h2 id="标记清理"><a href="#标记清理" class="headerlink" title="标记清理"></a>标记清理</h2><ul>
+<li>JavaScript 最常用的垃圾回收策略是标记清理（mark-and-sweep）</li>
+<li>标记方法<ul>
+<li>给变量加标记的方式有很多种，比如<ul>
+<li>当变量进入上下文时，反转某一位</li>
+<li>或者可以维护 “在上下文中”和“不在上下文中” 两个变量列表，可以把变量从一个列表转移到另一个列表。</li>
+</ul>
+</li>
+<li>标记过程的实现并不重要，关键是策略。</li>
+</ul>
+</li>
+<li>标记过程<ul>
+<li>垃圾回收程序运行的时候，会标记内存中存储的所有变量，标记方法有很多种</li>
+<li>然后，它会将所有在上下文中的变量，以及被在上下文中的变量引用的变量的标记去掉</li>
+<li>在此之后再被加上标记的变量就是待删除的了，原因是任何在上下文中的变量都访问不到它们了</li>
+<li>最后垃圾回收程序做一次内存清理，销毁带标记的所有值并收回它们的内存</li>
+</ul>
+</li>
+</ul>
+<h2 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h2><ul>
+<li>另一种没那么常用的垃圾回收策略是引用计数（reference counting）</li>
+<li>其思路是：<ul>
+<li>对每个值都记录它被引用的次数</li>
+<li>声明变量并给它赋一个引用值时，这个值的引用数为 1</li>
+<li>如果同一个值又被赋给另一个变量，那么引用数加 1</li>
+<li>如果保存对该值引用的变量被其他值给覆盖了，那么引用数减 1</li>
+<li>当一个值的引用数为 0 时，就说明没办法再访问到这个值了，因此可以安全地收回其内存了</li>
+<li>垃圾回收程序下次运行的时候就会释放引用数为 0 的值的内存</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>出现 <code>循环引用</code> 时，引用计数策略就不管用了<ul>
+<li>如下代码，对象 A 有一个指针指向对象 B，而对象 B 也引用了对象 A，他们的引用次数一值是 2</li>
+<li>在引用计数的策略下，他们的引用数永远不会变为 0 ，如果函数多次调用，则会导致大量内存永远不会被释放，也就是会导致 <code>内存泄露</code></li>
+<li>但是在标记清理的策略下，这不会有问题，因为在函数执行完毕后，两个对象都不在当前上下文中了</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">problem</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> objectA = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line">  <span class="keyword">let</span> objectB = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br><span class="line"></span><br><span class="line">  objectA.someOtherObject = objectB;</span><br><span class="line">  objectB.anotherObject = objectA;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>为了避免循环引用出现的问题，可以把变量设置为 null ，实际上会切断变量与其之前引用值之间的关系。当下次垃圾回收程序运行时，这些值就会被删除，内存也会被回收。</li>
+</ul>
+]]></content>
   </entry>
   <entry>
     <title>JS 语言基础之操作符与语句</title>
