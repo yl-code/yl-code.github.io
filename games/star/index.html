@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>STAR</title>
+  <style>@view-transition { navigation: auto; }</style>
+  <link rel="stylesheet" href="../play.css">
+</head>
+<body class="star">
+  <header class="top">
+    <a class="back" href="../" aria-label="~/games"><span>~/</span>star</a>
+    <div class="acts">
+      <button type="button" class="icon" id="pause" aria-label="PAUSE">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="on" d="M8.5 5.5v13M15.5 5.5v13"/><path class="off" d="M8 5.5v13l10-6.5z"/></svg>
+      </button>
+    </div>
+  </header>
+  <section class="readout">
+    <div class="stat"><span>SCORE</span><b id="score">000000</b></div>
+    <div class="stat"><span>HP</span><b id="hp">8/8</b></div>
+    <div class="stat"><span>BEST</span><b id="best">000000</b></div>
+  </section>
+  <div class="stage" id="stage">
+    <div class="field" id="field">
+      <div class="hullbar" aria-hidden="true"><i id="hpFill"></i><b id="shFill"></b></div>
+      <canvas id="board" class="board" width="96" height="160"></canvas>
+    </div>
+    <div class="mask" id="mask">
+      <div class="card">
+        <span class="idx">03</span>
+        <h2 id="maskTitle">STAR</h2>
+        <p id="maskText">10 STAGES · DRAG</p>
+        <div class="diff" id="diff">
+          <button type="button" data-d="0">EASY</button>
+          <button type="button" data-d="1">NORM</button>
+          <button type="button" data-d="2">HARD</button>
+        </div>
+        <button type="button" class="go" id="go">START</button>
+      </div>
+    </div>
+  </div>
+  <p class="hint" id="hint">DRAG</p>
+  <script src="../shell.js"></script>
+  <script src="./lines.js"></script>
+  <script src="./game.js"></script>
+  <script>
+    (function () {
+      var KEY = 'mosaic-star';
+      var DIFF_KEY = KEY + '-diff';
+      var HINTS = ['5 LIVES · 10 STAGES', '10 STAGES · DRAG', '2 LIVES · FAST'];
+      var canvas = document.getElementById('board');
+      var stage = document.getElementById('stage');
+      var field = document.getElementById('field');
+      var hullbar = document.querySelector('.hullbar');
+      var mask = document.getElementById('mask');
+      var maskTitle = document.getElementById('maskTitle');
+      var maskText = document.getElementById('maskText');
+      var go = document.getElementById('go');
+      var diffEl = document.getElementById('diff');
+      var hintEl = document.getElementById('hint');
+      var scoreEl = document.getElementById('score');
+      var hpEl = document.getElementById('hp');
+      var hpFill = document.getElementById('hpFill');
+      var shFill = document.getElementById('shFill');
+      var bestEl = document.getElementById('best');
+      var pauseBtn = document.getElementById('pause');
+      var game = ArcadeStar.create();
+      var diff = Arcade.loadDiff(DIFF_KEY);
+      var ctx = canvas.getContext('2d', { alpha: false });
+      var phase = 'ready';
+      var timer = 0;
+      var raf = 0;
+      var last = 0;
+      var shownScore = -1;
+      var shownHp = '';
+      var shownWave = -1;
+      var bestCache = 0;
+      var aiming = false;
+
+      function digits(n, width) {
+        return String(n).padStart(width, '0');
+      }
+
+      function layout() {
+        var barH = hullbar ? hullbar.offsetHeight : 0;
+        var aw = stage.clientWidth;
+        var ah = stage.clientHeight - barH;
+        var scale = Math.min(aw / game.W, ah / game.H);
+        var dpr, w, h, bw, bh;
+        if (scale < 1) scale = 1;
+        w = Math.floor(game.W * scale);
+        h = Math.floor(game.H * scale);
+        dpr = Arcade.backing(w, h, 200000);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        field.style.width = w + 'px';
+        bw = Math.floor(w * dpr);
+        bh = Math.floor(h * dpr);
+        if (canvas.width !== bw || canvas.height !== bh) {
+          canvas.width = bw;
+          canvas.height = bh;
+          ctx = canvas.getContext('2d', { alpha: false });
+        }
+        game.prepare(bw / game.W);
+        game.paint(ctx);
+      }
+
+      Arcade.onResize(layout);
+
+      function stopTimer() {
+        if (timer) clearTimeout(timer);
+        timer = 0;
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+      }
+
+      function bestKey() {
+        return KEY + ':' + diff;
+      }
+
+      function readBest() {
+        var best = Arcade.loadBest(bestKey());
+        if (!best && diff === 1) best = Arcade.loadBest(KEY);
+        return best;
+      }
+
+      function rememberBest() {
+        bestCache = readBest();
+        bestEl.textContent = digits(bestCache, 6);
+      }
+
+      function sync() {
+        var tag;
+        if (game.score > bestCache) {
+          bestCache = game.score;
+          bestEl.textContent = digits(bestCache, 6);
+        }
+        if (shownScore !== game.score) {
+          shownScore = game.score;
+          scoreEl.textContent = digits(game.score, 6);
+        }
+        tag = game.hp + '/' + game.maxHp;
+        if (shownHp !== tag) {
+          shownHp = tag;
+          hpEl.textContent = tag;
+          hpFill.style.width = (game.maxHp ? (100 * game.hp / game.maxHp) : 0) + '%';
+        }
+        shFill.style.width = (game.shield > 0 ? (100 * game.shield / 8000) : 0) + '%';
+        if (phase !== 'play') return;
+        tag = game.stage + ':' + game.hull + ':' + game.gun + ':' + (game.boss ? 1 : 0) + ':' + game.lives + ':' + (game.hurt ? 1 : 0) + ':' + (game.shield > 0 ? 1 : 0);
+        if (hintEl.dataset.tag === tag) return;
+        hintEl.dataset.tag = tag;
+        hintEl.textContent = 'ST' + digits(game.stage + 1, 2) + (game.boss ? ' BOSS' : '') + '  H' + (game.hull + 1) + '·G' + (game.gun + 1) + '  L' + game.lives + (game.hurt ? '  HURT' : '') + (game.shield > 0 ? '  SH' : '');
+      }
+
+      function markPause(paused) {
+        pauseBtn.classList.toggle('alt', paused);
+        pauseBtn.setAttribute('aria-label', paused ? 'RESUME' : 'PAUSE');
+      }
+
+      function paint() {
+        game.paint(ctx);
+        sync();
+      }
+
+      function showMask(title, text, button) {
+        maskTitle.textContent = title;
+        maskText.textContent = text;
+        go.textContent = button;
+        diffEl.hidden = phase === 'pause';
+        mask.hidden = false;
+      }
+
+      function finish() {
+        var best = Arcade.saveBest(bestKey(), game.score);
+        phase = 'over';
+        aiming = false;
+        stopTimer();
+        markPause(false);
+        bestCache = best;
+        bestEl.textContent = digits(bestCache, 6);
+        hintEl.dataset.tag = '';
+        hintEl.textContent = 'DRAG';
+        showMask(game.won ? 'CLEAR' : 'END', digits(game.score, 6) + ' · BEST ' + digits(best, 6), 'AGAIN');
+      }
+
+      function loop(now) {
+        var dt;
+        raf = 0;
+        if (phase !== 'play') return;
+        dt = now - last;
+        last = now;
+        if (!(dt > 0)) dt = 0;
+        if (dt > 48) dt = 48;
+        game.update(dt);
+        paint();
+        if (game.over) {
+          finish();
+          raf = requestAnimationFrame(fade);
+          return;
+        }
+        raf = requestAnimationFrame(loop);
+      }
+
+      function fade(now) {
+        var dt;
+        raf = 0;
+        if (phase !== 'over' || !game.hot()) return;
+        dt = now - last;
+        last = now;
+        if (!(dt > 0) || dt > 48) dt = 34;
+        game.update(dt);
+        game.paint(ctx);
+        raf = requestAnimationFrame(fade);
+      }
+
+      function start() {
+        game.setRank(diff);
+        game.reset();
+        phase = 'play';
+        shownScore = -1;
+        shownHp = '';
+        shownWave = -1;
+        markPause(false);
+        mask.hidden = true;
+        paint();
+        stopTimer();
+        last = performance.now();
+        raf = requestAnimationFrame(loop);
+      }
+
+      function pause() {
+        if (phase !== 'play') return;
+        phase = 'pause';
+        aiming = false;
+        stopTimer();
+        markPause(true);
+        showMask('PAUSE', 'SHIP IS STILL', 'RESUME');
+      }
+
+      function resume() {
+        if (phase !== 'pause') return;
+        phase = 'play';
+        markPause(false);
+        mask.hidden = true;
+        stopTimer();
+        last = performance.now();
+        raf = requestAnimationFrame(loop);
+      }
+
+      function aim(e) {
+        var rect, x, y;
+        if (phase !== 'play') return;
+        rect = canvas.getBoundingClientRect();
+        if (rect.width < 2) return;
+        x = ((e.clientX - rect.left) / rect.width) * game.W;
+        y = ((e.clientY - rect.top) / rect.height) * game.H;
+        game.aim(x, y);
+      }
+
+      stage.addEventListener('pointerdown', function (e) {
+        if (phase !== 'play') return;
+        if (e.target && e.target.closest && e.target.closest('.mask')) return;
+        aiming = true;
+        try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+        aim(e);
+      });
+      stage.addEventListener('pointermove', function (e) {
+        if (!aiming) return;
+        aim(e);
+      });
+      function release() { aiming = false; }
+      stage.addEventListener('pointerup', release);
+      stage.addEventListener('pointercancel', release);
+
+      pauseBtn.addEventListener('click', function () {
+        if (phase === 'play') pause();
+        else if (phase === 'pause') resume();
+      });
+      go.addEventListener('click', function () {
+        if (phase === 'pause') resume();
+        else start();
+      });
+      addEventListener('keydown', function (e) {
+        var k = e.key;
+        if (k === 'Enter') { go.click(); return; }
+        if (phase !== 'play') return;
+        if (k === 'ArrowLeft') { e.preventDefault(); game.nudge(-5, 0); }
+        else if (k === 'ArrowRight') { e.preventDefault(); game.nudge(5, 0); }
+        else if (k === 'ArrowUp') { e.preventDefault(); game.nudge(0, -5); }
+        else if (k === 'ArrowDown') { e.preventDefault(); game.nudge(0, 5); }
+      });
+      Arcade.onHide(function () { if (phase === 'play') pause(); });
+
+      function markDiff() {
+        var buttons = diffEl.querySelectorAll('button');
+        var i;
+        for (i = 0; i < buttons.length; i++) {
+          buttons[i].classList.toggle('on', parseInt(buttons[i].getAttribute('data-d'), 10) === diff);
+        }
+      }
+
+      function applyDiff(n) {
+        diff = n === 0 || n === 2 ? n : 1;
+        Arcade.saveDiff(DIFF_KEY, diff);
+        game.setRank(diff);
+        markDiff();
+        rememberBest();
+        if (phase !== 'play') hpEl.textContent = game.hp + '/' + game.maxHp;
+        if (phase === 'ready') maskText.textContent = bestCache ? 'BEST ' + digits(bestCache, 6) : HINTS[diff];
+      }
+
+      diffEl.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b || phase === 'pause') return;
+        applyDiff(parseInt(b.getAttribute('data-d'), 10));
+      });
+
+      game.setRank(diff);
+      markDiff();
+      hpEl.textContent = game.hp + '/' + game.maxHp;
+      rememberBest();
+      showMask('STAR', bestCache ? 'BEST ' + digits(bestCache, 6) : HINTS[diff], 'START');
+      layout();
+    })();
+  </script>
+</body>
+</html>

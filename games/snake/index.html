@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>SNAKE</title>
+  <style>@view-transition { navigation: auto; }</style>
+  <link rel="stylesheet" href="../play.css">
+</head>
+<body class="snake">
+  <header class="top">
+    <a class="back" href="../" aria-label="~/games"><span>~/</span>snake</a>
+    <div class="acts">
+      <button type="button" class="icon" id="pause" aria-label="PAUSE">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="on" d="M8.5 5.5v13M15.5 5.5v13"/><path class="off" d="M8 5.5v13l10-6.5z"/></svg>
+      </button>
+    </div>
+  </header>
+  <section class="readout">
+    <div class="stat"><span>SCORE</span><b id="score">000000</b></div>
+    <div class="stat"><span>LEN</span><b id="len">003</b></div>
+    <div class="stat"><span>BEST</span><b id="best">000000</b></div>
+  </section>
+  <div class="stage" id="stage">
+    <div class="well" id="well">
+    <canvas id="board" class="board" width="120" height="176"></canvas>
+    </div>
+    <div class="mask" id="mask">
+      <div class="card">
+        <span class="idx">02</span>
+        <h2 id="maskTitle">SNAKE</h2>
+        <p id="maskText">SWIPE TO TURN</p>
+        <div class="diff" id="diff">
+          <button type="button" data-d="0">EASY</button>
+          <button type="button" data-d="1">NORM</button>
+          <button type="button" data-d="2">HARD</button>
+        </div>
+        <button type="button" class="go" id="go">START</button>
+      </div>
+    </div>
+  </div>
+  <div class="pad">
+    <div class="keys">
+      <button type="button" class="arw" id="left">←</button>
+      <button type="button" class="arw" id="up">↑</button>
+      <button type="button" class="arw" id="down">↓</button>
+      <button type="button" class="arw" id="right">→</button>
+    </div>
+  </div>
+  <script src="../shell.js"></script>
+  <script src="./game.js"></script>
+  <script>
+    (function () {
+      var KEY = 'mosaic-snake';
+      var DIFF_KEY = KEY + '-diff';
+      var HINTS = ['SLOW', 'SWIPE TO TURN', 'FAST'];
+      var canvas = document.getElementById('board');
+      var stage = document.getElementById('stage');
+      var mask = document.getElementById('mask');
+      var maskTitle = document.getElementById('maskTitle');
+      var maskText = document.getElementById('maskText');
+      var go = document.getElementById('go');
+      var diffEl = document.getElementById('diff');
+      var scoreEl = document.getElementById('score');
+      var lenEl = document.getElementById('len');
+      var bestEl = document.getElementById('best');
+      var pauseBtn = document.getElementById('pause');
+      var game = ArcadeSnake.create();
+      var diff = Arcade.loadDiff(DIFF_KEY);
+      var ctx = canvas.getContext('2d', { alpha: false });
+      var phase = 'ready';
+      var timer = 0;
+      var raf = 0;
+      var last = 0;
+      var acc = 0;
+      var shown = -1;
+      var shownLen = -1;
+      var bestCache = 0;
+      var sx = 0;
+      var sy = 0;
+      var tracking = false;
+
+      function digits(n, width) {
+        return String(n).padStart(width, '0');
+      }
+
+      function layout() {
+        var aw = stage.clientWidth;
+        var ah = stage.clientHeight;
+        var size = Math.floor(Math.min((aw - 8) / 15, (ah - 8) / 22));
+        var dpr, cell, bw, bh, area;
+        if (size < 6) size = 6;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        if (dpr < 1) dpr = 1;
+        area = size * size * 330;
+        if (area * dpr * dpr > 360000) dpr = Math.sqrt(360000 / area);
+        cell = Math.max(4, Math.round(size * dpr));
+        bw = cell * 15;
+        bh = cell * 22;
+        canvas.style.width = (size * 15) + 'px';
+        canvas.style.height = (size * 22) + 'px';
+        if (canvas.width !== bw || canvas.height !== bh) {
+          canvas.width = bw;
+          canvas.height = bh;
+          ctx = canvas.getContext('2d', { alpha: false });
+        }
+        game.prepare(cell);
+        game.paint(ctx);
+      }
+
+      Arcade.onResize(layout);
+
+      function stopTimer() {
+        if (timer) clearTimeout(timer);
+        timer = 0;
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+      }
+
+      function bestKey() {
+        return KEY + ':' + diff;
+      }
+
+      function readBest() {
+        var best = Arcade.loadBest(bestKey());
+        if (!best && diff === 1) best = Arcade.loadBest(KEY);
+        return best;
+      }
+
+      function rememberBest() {
+        bestCache = readBest();
+        bestEl.textContent = digits(bestCache, 6);
+      }
+
+      function sync() {
+        if (game.score > bestCache) {
+          bestCache = game.score;
+          bestEl.textContent = digits(bestCache, 6);
+        }
+        if (shown === game.score && shownLen === game.len) return;
+        shown = game.score;
+        shownLen = game.len;
+        scoreEl.textContent = digits(game.score, 6);
+        lenEl.textContent = digits(game.len, 3);
+      }
+
+      var fxRaf = 0;
+
+      function markPause(paused) {
+        pauseBtn.classList.toggle('alt', paused);
+        pauseBtn.setAttribute('aria-label', paused ? 'RESUME' : 'PAUSE');
+      }
+
+      function fxFrame() {
+        fxRaf = 0;
+        if (!game.hot()) return;
+        game.paint(ctx);
+        fxRaf = requestAnimationFrame(fxFrame);
+      }
+
+      function paint() {
+        game.paint(ctx);
+        sync();
+        if (game.hot() && !fxRaf) fxRaf = requestAnimationFrame(fxFrame);
+      }
+
+      function showMask(title, text, button) {
+        maskTitle.textContent = title;
+        maskText.textContent = text;
+        go.textContent = button;
+        diffEl.hidden = phase === 'pause';
+        mask.hidden = false;
+      }
+
+      function finish() {
+        var best = Arcade.saveBest(bestKey(), game.score);
+        phase = 'over';
+        stopTimer();
+        markPause(false);
+        bestCache = best;
+        bestEl.textContent = digits(bestCache, 6);
+        showMask(game.won ? 'FULL' : 'END', digits(game.score, 6) + ' · BEST ' + digits(bestCache, 6), 'AGAIN');
+      }
+
+      function frame(now) {
+        var dt, limit, wait;
+        raf = 0;
+        if (phase !== 'play') return;
+        dt = now - last;
+        last = now;
+        if (dt < 0) dt = 0;
+        if (dt > 80) dt = 80;
+        acc += dt;
+        limit = 0;
+        while (game.alive && limit < 4) {
+          wait = game.delay();
+          if (acc < wait) break;
+          acc -= wait;
+          game.tick();
+          limit++;
+        }
+        if (!game.alive) acc = 0;
+        game.setGlide(game.alive && game.delay() ? acc / game.delay() : 0);
+        paint();
+        if (!game.alive) {
+          finish();
+          if (game.hot()) raf = requestAnimationFrame(fxFrame);
+          return;
+        }
+        raf = requestAnimationFrame(frame);
+      }
+
+      function start() {
+        game.setRank(diff);
+        game.reset();
+        phase = 'play';
+        shown = -1;
+        acc = 0;
+        game.setGlide(0);
+        markPause(false);
+        mask.hidden = true;
+        paint();
+        stopTimer();
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+
+      function pause() {
+        if (phase !== 'play') return;
+        phase = 'pause';
+        stopTimer();
+        markPause(true);
+        showMask('PAUSE', 'SNAKE IS STILL', 'RESUME');
+      }
+
+      function resume() {
+        if (phase !== 'pause') return;
+        phase = 'play';
+        markPause(false);
+        mask.hidden = true;
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+
+      function steer(x, y) {
+        if (phase !== 'play') return;
+        game.turn(x, y);
+      }
+
+      document.getElementById('up').addEventListener('pointerdown', function (e) { e.preventDefault(); steer(0, -1); });
+      document.getElementById('down').addEventListener('pointerdown', function (e) { e.preventDefault(); steer(0, 1); });
+      document.getElementById('left').addEventListener('pointerdown', function (e) { e.preventDefault(); steer(-1, 0); });
+      document.getElementById('right').addEventListener('pointerdown', function (e) { e.preventDefault(); steer(1, 0); });
+
+      canvas.addEventListener('pointerdown', function (e) {
+        if (phase !== 'play') return;
+        tracking = true;
+        sx = e.clientX;
+        sy = e.clientY;
+      });
+      canvas.addEventListener('pointerup', function (e) {
+        var dx, dy;
+        if (!tracking) return;
+        tracking = false;
+        if (phase !== 'play') return;
+        dx = e.clientX - sx;
+        dy = e.clientY - sy;
+        if (Math.abs(dx) < 18 && Math.abs(dy) < 18) return;
+        if (Math.abs(dx) > Math.abs(dy)) steer(dx < 0 ? -1 : 1, 0);
+        else steer(0, dy < 0 ? -1 : 1);
+      });
+
+      pauseBtn.addEventListener('click', function () {
+        if (phase === 'play') pause();
+        else if (phase === 'pause') resume();
+      });
+      go.addEventListener('click', function () {
+        if (phase === 'pause') resume();
+        else start();
+      });
+      addEventListener('keydown', function (e) {
+        var k = e.key;
+        if (k === 'Enter') { go.click(); return; }
+        if (phase !== 'play') return;
+        if (k === 'ArrowLeft') { e.preventDefault(); steer(-1, 0); }
+        else if (k === 'ArrowRight') { e.preventDefault(); steer(1, 0); }
+        else if (k === 'ArrowUp') { e.preventDefault(); steer(0, -1); }
+        else if (k === 'ArrowDown') { e.preventDefault(); steer(0, 1); }
+      });
+      Arcade.onHide(function () { if (phase === 'play') pause(); });
+
+      function markDiff() {
+        var buttons = diffEl.querySelectorAll('button');
+        var i;
+        for (i = 0; i < buttons.length; i++) {
+          buttons[i].classList.toggle('on', parseInt(buttons[i].getAttribute('data-d'), 10) === diff);
+        }
+      }
+
+      function applyDiff(n) {
+        diff = n === 0 || n === 2 ? n : 1;
+        Arcade.saveDiff(DIFF_KEY, diff);
+        game.setRank(diff);
+        markDiff();
+        rememberBest();
+        if (phase === 'ready') maskText.textContent = bestCache ? 'BEST ' + digits(bestCache, 6) : HINTS[diff];
+      }
+
+      diffEl.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b || phase === 'pause') return;
+        applyDiff(parseInt(b.getAttribute('data-d'), 10));
+      });
+
+      game.setRank(diff);
+      markDiff();
+      rememberBest();
+      showMask('SNAKE', bestCache ? 'BEST ' + digits(bestCache, 6) : HINTS[diff], 'START');
+      layout();
+    })();
+  </script>
+</body>
+</html>

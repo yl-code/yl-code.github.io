@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>TETRIS</title>
+  <style>@view-transition { navigation: auto; }</style>
+  <link rel="stylesheet" href="../play.css">
+</head>
+<body class="tetris">
+  <header class="top">
+    <a class="back" href="../" aria-label="~/games"><span>~/</span>tetris</a>
+    <div class="acts">
+      <button type="button" class="icon" id="sound" aria-label="SFX" aria-pressed="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="on" d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18 7a7 7 0 0 1 0 10"/><path class="off" d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+      </button>
+      <button type="button" class="icon" id="pause" aria-label="PAUSE">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="on" d="M8.5 5.5v13M15.5 5.5v13"/><path class="off" d="M8 5.5v13l10-6.5z"/></svg>
+      </button>
+    </div>
+  </header>
+  <section class="hud">
+    <div class="score"><span>SCORE</span><b id="score">000000</b></div>
+    <div class="best"><span>BEST</span><b id="best">000000</b></div>
+  </section>
+  <div class="field" id="field">
+    <div class="dock" id="dock">
+      <div class="well" id="well">
+        <canvas id="board" width="200" height="400"></canvas>
+        <div class="cue" id="cue" aria-live="polite"><b id="cueMain"></b><span id="cueSub"></span></div>
+      </div>
+      <aside class="rail" id="rail">
+        <div class="slot">
+          <span>NEXT</span>
+          <canvas id="next" width="112" height="192"></canvas>
+        </div>
+        <div class="slot" id="holdSlot">
+          <span>HOLD</span>
+          <canvas id="hold" width="112" height="56"></canvas>
+        </div>
+        <div class="meta">
+          <span>LV</span>
+          <b id="level">01</b>
+          <i class="meter"><i id="meter"></i></i>
+        </div>
+        <div class="meta">
+          <span>LINES</span>
+          <b id="lines">000</b>
+        </div>
+      </aside>
+    </div>
+    <div class="mask" id="mask">
+      <div class="card">
+        <span class="idx">01</span>
+        <h2 id="maskTitle">TETRIS</h2>
+        <p id="maskText">SWIPE · ROT · HOLD</p>
+        <div class="diff" id="diff">
+          <button type="button" data-d="0">EASY</button>
+          <button type="button" data-d="1">NORM</button>
+          <button type="button" data-d="2">HARD</button>
+        </div>
+        <div class="aids" id="aids"><span id="aidGhost">GHOST</span><span id="aidHold">HOLD</span><span id="aidNext">NEXT 3</span></div>
+        <button type="button" class="go" id="go">START</button>
+      </div>
+    </div>
+  </div>
+  <div class="pad">
+    <div class="keys">
+      <button type="button" class="arw" id="left">←</button>
+      <button type="button" class="arw" id="down">↓</button>
+      <button type="button" class="arw" id="right">→</button>
+    </div>
+    <div class="keys">
+      <button type="button" id="holdBtn">HOLD<i>C</i></button>
+      <button type="button" id="rot">ROT<i>↑</i></button>
+      <button type="button" id="drop">DROP<i>SPACE</i></button>
+    </div>
+  </div>
+  <script src="../shell.js"></script>
+  <script src="./game.js"></script>
+  <script>
+    (function () {
+      var KEY = 'mosaic-tetris';
+      var DIFF_KEY = KEY + '-diff';
+      var SOUND_KEY = 'mosaic-sound';
+      var CLIPS = {
+        start: [3.7202, 3.6224],
+        clear: [0, 0.7675],
+        fall: [1.2558, 0.3546],
+        over: [8.1276, 1.1437],
+        rotate: [2.2471, 0.0807],
+        move: [2.9088, 0.1437]
+      };
+      var MAX_CELL = 32;
+      var RAIL_MIN = 56;
+      var RAIL_MAX = 80;
+      var HINTS = ['SLOW · LONG LOCK', 'STEADY PACE', 'FAST · FROM LV 03'];
+      var KEYMAP = { ArrowLeft: 'left', ArrowRight: 'right', ArrowDown: 'down', ArrowUp: 'rot', x: 'rot', X: 'rot', z: 'rot', Z: 'rot', ' ': 'drop', c: 'holdBtn', C: 'holdBtn', Shift: 'holdBtn' };
+      var DAS = 150;
+      var ARR = 45;
+      var SOFT = 35;
+      var canvas = document.getElementById('board');
+      var next = document.getElementById('next');
+      var hold = document.getElementById('hold');
+      var field = document.getElementById('field');
+      var well = document.getElementById('well');
+      var dock = document.getElementById('dock');
+      var rail = document.getElementById('rail');
+      var meter = document.getElementById('meter');
+      var cueEl = document.getElementById('cue');
+      var cueMain = document.getElementById('cueMain');
+      var cueSub = document.getElementById('cueSub');
+      var diffEl = document.getElementById('diff');
+      var mask = document.getElementById('mask');
+      var maskTitle = document.getElementById('maskTitle');
+      var maskText = document.getElementById('maskText');
+      var go = document.getElementById('go');
+      var scoreEl = document.getElementById('score');
+      var linesEl = document.getElementById('lines');
+      var levelEl = document.getElementById('level');
+      var bestEl = document.getElementById('best');
+      var pauseBtn = document.getElementById('pause');
+      var soundBtn = document.getElementById('sound');
+      var holdSlot = document.getElementById('holdSlot');
+      var holdKey = document.getElementById('holdBtn');
+      var aidsEl = document.getElementById('aids');
+      var aidGhost = document.getElementById('aidGhost');
+      var aidHold = document.getElementById('aidHold');
+      var aidNext = document.getElementById('aidNext');
+      var keyEls = document.querySelectorAll('.keys button');
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      var audio = null;
+      var clipBuf = null;
+      var soundOn = readSound();
+      var started = false;
+      var lastMove = -1;
+      var wasClearing = false;
+      var wasAlive = false;
+      var game = ArcadeTetris.create();
+      var diff = Arcade.loadDiff(DIFF_KEY);
+      var ctx = canvas.getContext('2d', { alpha: false });
+      var nextCtx = next.getContext('2d', { alpha: false });
+      var holdCtx = hold.getContext('2d', { alpha: false });
+      var phase = 'ready';
+      var raf = 0;
+      var last = 0;
+      var cell = 20;
+      var shownScore = -1;
+      var shownLines = -1;
+      var shownLevel = -1;
+      var shownPreview = -1;
+      var shownCue = 0;
+      var cueAnim = null;
+      var bestCache = 0;
+      var bestBefore = 0;
+      var leftOn = false;
+      var rightOn = false;
+      var downOn = false;
+      var side = 0;
+      var sideAt = 0;
+      var downAt = 0;
+      var touch = null;
+
+      function digits(n, width) {
+        return String(n).padStart(width, '0');
+      }
+
+      function readSound() {
+        try {
+          return localStorage.getItem(SOUND_KEY) !== '0';
+        } catch (e) {
+          return true;
+        }
+      }
+
+      function loadSound() {
+        var Offline = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (!AudioCtx || !Offline || !window.fetch || location.protocol.indexOf('http') !== 0) return;
+        fetch('./music.mp3').then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.arrayBuffer();
+        }).then(function (data) {
+          new Offline(1, 2, 44100).decodeAudioData(data, function (buf) { clipBuf = buf; }, function () {});
+        }).catch(function () {});
+      }
+
+      function unlockSound() {
+        if (!soundOn || !AudioCtx) return;
+        if (!audio) audio = new AudioCtx();
+        if (audio.state !== 'running') audio.resume();
+      }
+
+      function play(name) {
+        var clip = CLIPS[name];
+        var src;
+        if (!soundOn || !audio || !clipBuf) return false;
+        if (name === 'move') {
+          if (audio.currentTime - lastMove < 0.03) return true;
+          lastMove = audio.currentTime;
+        }
+        src = audio.createBufferSource();
+        src.buffer = clipBuf;
+        src.connect(audio.destination);
+        src.start(0, clip[0], clip[1]);
+        return true;
+      }
+
+      function markSound() {
+        soundBtn.classList.toggle('alt', !soundOn);
+        soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+      }
+
+      function markPause(paused) {
+        pauseBtn.classList.toggle('alt', paused);
+        pauseBtn.setAttribute('aria-label', paused ? 'RESUME' : 'PAUSE');
+      }
+
+      function setSound(on) {
+        soundOn = on;
+        try { localStorage.setItem(SOUND_KEY, on ? '1' : '0'); } catch (e) {}
+        markSound();
+        if (on) unlockSound();
+        else if (audio && audio.state === 'running') audio.suspend();
+      }
+
+      function fitMini(el, g, dpr) {
+        var w = Math.round(el.clientWidth * dpr);
+        var h = Math.round(el.clientHeight * dpr);
+        if (el.width === w && el.height === h) return g;
+        el.width = w;
+        el.height = h;
+        return el.getContext('2d', { alpha: false });
+      }
+
+      function layout() {
+        var box = getComputedStyle(field);
+        var frame = well.offsetWidth - canvas.offsetWidth;
+        var gap = parseFloat(getComputedStyle(dock).columnGap) || 0;
+        var room = Math.min(document.documentElement.clientWidth, 430) - 24;
+        var ah = field.clientHeight - parseFloat(box.paddingTop) - parseFloat(box.paddingBottom) - frame;
+        var size = Math.floor(Math.min((room - RAIL_MIN - gap - frame) / 10, ah / 20, MAX_CELL));
+        var preview = game.aids.preview;
+        var dpr, unit, pw;
+        if (size < 6) size = 6;
+        cell = size;
+        document.body.style.setProperty('--col', Math.min(room, size * 10 + frame + gap + RAIL_MAX) + 'px');
+        dpr = Arcade.backing(size * 10, size * 20, 1600000);
+        unit = Math.max(4, Math.round(size * dpr));
+        canvas.style.width = (size * 10) + 'px';
+        canvas.style.height = (size * 20) + 'px';
+        if (canvas.width !== unit * 10 || canvas.height !== unit * 20) {
+          canvas.width = unit * 10;
+          canvas.height = unit * 20;
+          ctx = canvas.getContext('2d', { alpha: false });
+        }
+        pw = Math.max(32, Math.min(64, rail.clientWidth) & ~3);
+        next.style.width = pw + 'px';
+        next.style.height = (preview * pw / 2 + (preview - 1) * 8) + 'px';
+        hold.style.width = pw + 'px';
+        hold.style.height = (pw / 2) + 'px';
+        nextCtx = fitMini(next, nextCtx, dpr);
+        holdCtx = fitMini(hold, holdCtx, dpr);
+        game.prepare(unit);
+        game.paint(ctx);
+        shownPreview = -1;
+        sync();
+      }
+
+      function bestKey() {
+        return KEY + ':' + diff;
+      }
+
+      function readBest() {
+        var best = Arcade.loadBest(bestKey());
+        if (!best && diff === 1) best = Arcade.loadBest(KEY);
+        return best;
+      }
+
+      function rememberBest() {
+        bestCache = readBest();
+        bestEl.textContent = digits(bestCache, 6);
+      }
+
+      function showCue(main, sub) {
+        if (!main) return;
+        cueMain.textContent = main;
+        cueSub.textContent = sub || '';
+        if (cueAnim) cueAnim.cancel();
+        if (!cueEl.animate) return;
+        cueAnim = cueEl.animate([
+          { opacity: 0, transform: 'translateY(6px)' },
+          { opacity: 1, transform: 'translateY(0)', offset: 0.12 },
+          { opacity: 1, transform: 'translateY(0)', offset: 0.72 },
+          { opacity: 0, transform: 'translateY(-4px)' }
+        ], { duration: 1100, easing: 'ease-out' });
+      }
+
+      function hideCue() {
+        if (cueAnim) cueAnim.cancel();
+        cueAnim = null;
+      }
+
+      function sync() {
+        if (shownScore !== game.score) {
+          shownScore = game.score;
+          scoreEl.textContent = digits(shownScore, 6);
+          if (shownScore > bestCache) {
+            bestCache = shownScore;
+            bestEl.textContent = digits(bestCache, 6);
+          }
+        }
+        if (shownLines !== game.lines) {
+          shownLines = game.lines;
+          linesEl.textContent = digits(shownLines, 3);
+          meter.style.transform = 'scaleX(' + game.progress + ')';
+        }
+        if (shownLevel !== game.level) {
+          shownLevel = game.level;
+          levelEl.textContent = digits(shownLevel, 2);
+        }
+        if (shownPreview !== game.previewRev) {
+          shownPreview = game.previewRev;
+          game.paintNext(nextCtx);
+          game.paintHold(holdCtx);
+        }
+        if (shownCue !== game.cue.id) {
+          shownCue = game.cue.id;
+          showCue(game.cue.main, game.cue.sub);
+        }
+      }
+
+      function repeat(now) {
+        var n = 0;
+        while (side && now >= sideAt && n < 10) {
+          if (!moveSide(side, false)) {
+            sideAt = now + ARR;
+            break;
+          }
+          sideAt += ARR;
+          n++;
+        }
+        n = 0;
+        while (downOn && now >= downAt && n < 20) {
+          stepDown(false);
+          downAt += SOFT;
+          n++;
+        }
+      }
+
+      function frame(now) {
+        var dt = now - last;
+        raf = 0;
+        if (phase !== 'play') return;
+        last = now;
+        if (dt < 0) dt = 0;
+        if (dt > 100) dt = 100;
+        repeat(now);
+        game.advance(dt);
+        if (game.clearing && !wasClearing) play('clear');
+        if (!game.alive && wasAlive) play('over');
+        wasClearing = game.clearing;
+        wasAlive = game.alive;
+        if (game.dirty) game.paint(ctx);
+        sync();
+        if (game.over) {
+          finish();
+          return;
+        }
+        raf = requestAnimationFrame(frame);
+      }
+
+      function run() {
+        if (raf) cancelAnimationFrame(raf);
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
+
+      function halt() {
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+      }
+
+      function lit(id, on) {
+        var el = document.getElementById(id);
+        if (!el || el.hidden) return;
+        el.classList.toggle('down', on);
+      }
+
+      function moveSide(d, pressed) {
+        var ok = d < 0 ? game.left() : game.right();
+        if (ok || pressed) play('move');
+        return ok;
+      }
+
+      function stepDown(pressed) {
+        var ok = game.softDrop();
+        if (ok || pressed) play('move');
+        return ok;
+      }
+
+      function spin(dir) {
+        if (!game.active) return;
+        play('rotate');
+        if (dir < 0) game.rotateBack();
+        else game.rotate();
+      }
+
+      function stash() {
+        if (game.hold()) play('rotate');
+      }
+
+      function slam() {
+        if (!game.active) return;
+        play('fall');
+        game.hardDrop();
+      }
+
+      function pressSide(d) {
+        if (phase !== 'play') return;
+        if (d < 0) leftOn = true;
+        else rightOn = true;
+        side = d;
+        sideAt = performance.now() + DAS;
+        moveSide(d, true);
+      }
+
+      function releaseSide(d) {
+        if (d < 0) leftOn = false;
+        else rightOn = false;
+        if (side !== d) return;
+        side = leftOn ? -1 : rightOn ? 1 : 0;
+        sideAt = performance.now() + DAS;
+      }
+
+      function pressDown() {
+        if (phase !== 'play') return;
+        downOn = true;
+        downAt = performance.now() + SOFT;
+        stepDown(true);
+      }
+
+      function releaseDown() {
+        downOn = false;
+      }
+
+      function releaseAll() {
+        var i;
+        leftOn = false;
+        rightOn = false;
+        downOn = false;
+        side = 0;
+        touch = null;
+        for (i = 0; i < keyEls.length; i++) keyEls[i].classList.remove('down');
+      }
+
+      function showMask(title, text, button) {
+        maskTitle.textContent = title;
+        maskText.textContent = text;
+        go.textContent = button;
+        diffEl.hidden = phase === 'pause';
+        aidsEl.hidden = phase === 'pause';
+        mask.hidden = false;
+      }
+
+      function markAids() {
+        var aids = game.aids;
+        aidGhost.hidden = !aids.ghost;
+        aidHold.hidden = !aids.hold;
+        aidNext.textContent = 'NEXT ' + aids.preview;
+        holdKey.hidden = !aids.hold;
+        holdSlot.hidden = !aids.hold;
+        layout();
+      }
+
+      function start() {
+        game.setRank(diff);
+        game.reset();
+        phase = 'play';
+        releaseAll();
+        hideCue();
+        unlockSound();
+        if (!started) started = play('start');
+        wasClearing = false;
+        wasAlive = true;
+        bestBefore = bestCache;
+        shownCue = game.cue.id;
+        markPause(false);
+        mask.hidden = true;
+        game.paint(ctx);
+        sync();
+        run();
+      }
+
+      function pause() {
+        if (phase !== 'play' || !game.alive) return;
+        phase = 'pause';
+        halt();
+        releaseAll();
+        hideCue();
+        markPause(true);
+        showMask('PAUSE', 'BOARD IS STILL', 'RESUME');
+      }
+
+      function resume() {
+        if (phase !== 'pause') return;
+        phase = 'play';
+        unlockSound();
+        markPause(false);
+        mask.hidden = true;
+        run();
+      }
+
+      function finish() {
+        var record = game.score > bestBefore;
+        phase = 'over';
+        halt();
+        releaseAll();
+        markPause(false);
+        bestCache = Arcade.saveBest(bestKey(), game.score);
+        bestEl.textContent = digits(bestCache, 6);
+        showMask(record ? 'NEW BEST' : 'END', digits(game.score, 6) + ' · ' + game.lines + ' LINES', 'AGAIN');
+      }
+
+      function bindPad(id, down, up) {
+        var el = document.getElementById(id);
+        var on = false;
+        function off() {
+          if (!on) return;
+          on = false;
+          el.classList.remove('down');
+          if (up) up();
+        }
+        el.addEventListener('pointerdown', function (e) {
+          e.preventDefault();
+          if (el.hidden) return;
+          try { el.setPointerCapture(e.pointerId); } catch (err) {}
+          on = true;
+          el.classList.add('down');
+          down();
+        });
+        el.addEventListener('pointerup', off);
+        el.addEventListener('pointercancel', off);
+        el.addEventListener('lostpointercapture', off);
+      }
+
+      bindPad('left', function () { pressSide(-1); }, function () { releaseSide(-1); });
+      bindPad('right', function () { pressSide(1); }, function () { releaseSide(1); });
+      bindPad('down', pressDown, releaseDown);
+      bindPad('rot', function () { if (phase === 'play') spin(1); });
+      bindPad('holdBtn', function () { if (phase === 'play') stash(); });
+      bindPad('drop', function () { if (phase === 'play') slam(); });
+
+      field.addEventListener('pointerdown', function (e) {
+        if (phase !== 'play' || touch) return;
+        if (e.target.closest && e.target.closest('.mask')) return;
+        touch = { id: e.pointerId, x: e.clientX, y: e.clientY, t: e.timeStamp, ly: e.clientY, lt: e.timeStamp, vy: 0, sx: 0, sy: 0, axis: 0 };
+        try { field.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+      field.addEventListener('pointermove', function (e) {
+        var t = touch;
+        var dx, dy, gap, step;
+        if (!t || e.pointerId !== t.id || phase !== 'play') return;
+        gap = e.timeStamp - t.lt;
+        if (gap > 0) t.vy = t.vy * 0.4 + ((e.clientY - t.ly) / gap) * 0.6;
+        t.ly = e.clientY;
+        t.lt = e.timeStamp;
+        dx = e.clientX - t.x;
+        dy = e.clientY - t.y;
+        if (!t.axis) {
+          if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+          t.axis = Math.abs(dx) >= Math.abs(dy) ? 1 : 2;
+        }
+        if (t.axis === 1) {
+          step = Math.trunc(dx / Math.max(16, cell * 0.9));
+          while (t.sx < step) { t.sx++; moveSide(1, false); }
+          while (t.sx > step) { t.sx--; moveSide(-1, false); }
+        } else if (dy > 0) {
+          step = Math.trunc(dy / Math.max(14, cell * 0.8));
+          while (t.sy < step) { t.sy++; stepDown(false); }
+        }
+      });
+      function endTouch(e) {
+        var t = touch;
+        var dy;
+        if (!t || e.pointerId !== t.id) return;
+        touch = null;
+        if (phase !== 'play' || e.type === 'pointercancel') return;
+        dy = e.clientY - t.y;
+        if (!t.axis) {
+          if (e.timeStamp - t.t < 400) spin(1);
+          return;
+        }
+        if (t.axis !== 2) return;
+        if (dy < -36) stash();
+        else if (dy > 36 && t.vy > 0.6 && e.timeStamp - t.lt < 80) slam();
+      }
+      field.addEventListener('pointerup', endTouch);
+      field.addEventListener('pointercancel', endTouch);
+
+      pauseBtn.addEventListener('click', function () {
+        pauseBtn.blur();
+        if (phase === 'play') pause();
+        else if (phase === 'pause') resume();
+      });
+      soundBtn.addEventListener('click', function () {
+        soundBtn.blur();
+        setSound(!soundOn);
+      });
+      go.addEventListener('click', function () {
+        go.blur();
+        if (phase === 'pause') resume();
+        else start();
+      });
+      addEventListener('keydown', function (e) {
+        var k = e.key;
+        if (k === 'Enter') {
+          if (!mask.hidden) {
+            e.preventDefault();
+            go.click();
+          }
+          return;
+        }
+        if (k === 'Escape' || k === 'p' || k === 'P') {
+          if (phase === 'play') pause();
+          else if (phase === 'pause') resume();
+          return;
+        }
+        if ((k === 's' || k === 'S') && !e.repeat) {
+          setSound(!soundOn);
+          return;
+        }
+        if (phase !== 'play') return;
+        if (k === ' ' || k.indexOf('Arrow') === 0) e.preventDefault();
+        if (e.repeat) return;
+        if (KEYMAP[k]) lit(KEYMAP[k], true);
+        if (k === 'ArrowLeft') pressSide(-1);
+        else if (k === 'ArrowRight') pressSide(1);
+        else if (k === 'ArrowDown') pressDown();
+        else if (k === 'ArrowUp' || k === 'x' || k === 'X') spin(1);
+        else if (k === 'z' || k === 'Z') spin(-1);
+        else if (k === ' ') slam();
+        else if (k === 'c' || k === 'C' || k === 'Shift') stash();
+      });
+      addEventListener('keyup', function (e) {
+        if (KEYMAP[e.key]) lit(KEYMAP[e.key], false);
+        if (e.key === 'ArrowLeft') releaseSide(-1);
+        else if (e.key === 'ArrowRight') releaseSide(1);
+        else if (e.key === 'ArrowDown') releaseDown();
+      });
+      addEventListener('blur', function () {
+        releaseAll();
+        pause();
+      });
+      Arcade.onHide(pause);
+      Arcade.onResize(layout);
+
+      function markDiff() {
+        var buttons = diffEl.querySelectorAll('button');
+        var i;
+        for (i = 0; i < buttons.length; i++) {
+          buttons[i].classList.toggle('on', parseInt(buttons[i].getAttribute('data-d'), 10) === diff);
+        }
+      }
+
+      function applyDiff(n) {
+        diff = n === 0 || n === 2 ? n : 1;
+        Arcade.saveDiff(DIFF_KEY, diff);
+        game.setRank(diff);
+        markDiff();
+        markAids();
+        rememberBest();
+        if (phase === 'ready') maskText.textContent = bestCache ? 'BEST ' + digits(bestCache, 6) : HINTS[diff];
+      }
+
+      diffEl.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b || phase === 'pause') return;
+        applyDiff(parseInt(b.getAttribute('data-d'), 10));
+      });
+
+      game.setRank(diff);
+      markDiff();
+      rememberBest();
+      markSound();
+      loadSound();
+      showMask('TETRIS', bestCache ? 'BEST ' + digits(bestCache, 6) : HINTS[diff], 'START');
+      markAids();
+      requestAnimationFrame(layout);
+    })();
+  </script>
+</body>
+</html>
