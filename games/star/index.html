@@ -20,27 +20,26 @@
   </header>
   <section class="readout">
     <div class="stat"><span>SCORE</span><b id="score">000000</b></div>
-    <div class="stat"><span>HP</span><b id="hp">8/8</b></div>
     <div class="stat"><span>BEST</span><b id="best">000000</b></div>
   </section>
   <div class="stage" id="stage">
     <div class="field" id="field">
-      <div class="hullbar" aria-hidden="true"><i id="hpFill"></i><b id="shFill"></b></div>
       <canvas id="board" class="board" width="96" height="160"></canvas>
-    </div>
-    <div class="mask" id="mask">
-      <div class="card">
-        <span class="idx">03</span>
-        <h2 id="maskTitle">STAR</h2>
-        <p id="maskText">10 STAGES · DRAG</p>
-        <div class="diff" id="diff">
-          <button type="button" data-d="0">EASY</button>
-          <button type="button" data-d="1">NORM</button>
-          <button type="button" data-d="2">HARD</button>
+      <div class="mask" id="mask">
+        <div class="card">
+          <span class="idx">03</span>
+          <h2 id="maskTitle">STAR</h2>
+          <p id="maskText">10 STAGES · DRAG</p>
+          <div class="diff" id="diff">
+            <button type="button" data-d="0">EASY</button>
+            <button type="button" data-d="1">NORM</button>
+            <button type="button" data-d="2">HARD</button>
+          </div>
+          <button type="button" class="go" id="go">START</button>
         </div>
-        <button type="button" class="go" id="go">START</button>
       </div>
     </div>
+    <p class="hull" id="hull"><span>HP</span><b id="hp">8/8</b></p>
   </div>
   <p class="hint" id="hint">DRAG</p>
   <script src="../shell.js"></script>
@@ -54,7 +53,7 @@
       var canvas = document.getElementById('board');
       var stage = document.getElementById('stage');
       var field = document.getElementById('field');
-      var hullbar = document.querySelector('.hullbar');
+      var hull = document.getElementById('hull');
       var mask = document.getElementById('mask');
       var maskTitle = document.getElementById('maskTitle');
       var maskText = document.getElementById('maskText');
@@ -63,8 +62,6 @@
       var hintEl = document.getElementById('hint');
       var scoreEl = document.getElementById('score');
       var hpEl = document.getElementById('hp');
-      var hpFill = document.getElementById('hpFill');
-      var shFill = document.getElementById('shFill');
       var bestEl = document.getElementById('best');
       var pauseBtn = document.getElementById('pause');
       var game = ArcadeStar.create();
@@ -85,18 +82,31 @@
       }
 
       function layout() {
-        var barH = hullbar ? hullbar.offsetHeight : 0;
-        var aw = stage.clientWidth;
-        var ah = stage.clientHeight - barH;
-        var scale = Math.min(aw / game.W, ah / game.H);
-        var dpr, w, h, bw, bh;
-        if (scale < 1) scale = 1;
-        w = Math.floor(game.W * scale);
-        h = Math.floor(game.H * scale);
+        var stageCss = getComputedStyle(stage);
+        var fieldCss = getComputedStyle(field);
+        var hullH = hull ? hull.offsetHeight : 0;
+        var aw = stage.clientWidth
+          - (parseFloat(stageCss.paddingLeft) || 0)
+          - (parseFloat(stageCss.paddingRight) || 0);
+        var ah = stage.clientHeight
+          - (parseFloat(stageCss.paddingTop) || 0)
+          - (parseFloat(stageCss.paddingBottom) || 0)
+          - (parseFloat(fieldCss.paddingTop) || 0)
+          - (parseFloat(fieldCss.paddingBottom) || 0)
+          - hullH;
+        var w = Math.floor(aw);
+        var h, viewH, dpr, bw, bh;
+        if (!(w > 0)) w = game.W;
+        h = Math.floor(w * game.H / game.W);
+        if (!(h > 0)) h = game.H;
+        viewH = h;
+        if (ah > 0 && h > ah) viewH = Math.floor(ah);
         dpr = Arcade.backing(w, h, 200000);
         canvas.style.width = w + 'px';
         canvas.style.height = h + 'px';
+        canvas.style.marginTop = (viewH - h) + 'px';
         field.style.width = w + 'px';
+        field.style.height = viewH + 'px';
         bw = Math.floor(w * dpr);
         bh = Math.floor(h * dpr);
         if (canvas.width !== bw || canvas.height !== bh) {
@@ -146,9 +156,7 @@
         if (shownHp !== tag) {
           shownHp = tag;
           hpEl.textContent = tag;
-          hpFill.style.width = (game.maxHp ? (100 * game.hp / game.maxHp) : 0) + '%';
         }
-        shFill.style.width = (game.shield > 0 ? (100 * game.shield / 8000) : 0) + '%';
         if (phase !== 'play') return;
         tag = game.stage + ':' + game.hull + ':' + game.gun + ':' + (game.boss ? 1 : 0) + ':' + game.lives + ':' + (game.hurt ? 1 : 0) + ':' + (game.shield > 0 ? 1 : 0);
         if (hintEl.dataset.tag === tag) return;
@@ -263,7 +271,7 @@
 
       stage.addEventListener('pointerdown', function (e) {
         if (phase !== 'play') return;
-        if (e.target && e.target.closest && e.target.closest('.mask')) return;
+        if (e.target && e.target.closest && e.target.closest('.mask, .hull')) return;
         aiming = true;
         try { stage.setPointerCapture(e.pointerId); } catch (err) {}
         aim(e);
@@ -286,7 +294,13 @@
       });
       addEventListener('keydown', function (e) {
         var k = e.key;
-        if (k === 'Enter') { go.click(); return; }
+        if (k === 'Enter') {
+          if (!mask.hidden) {
+            e.preventDefault();
+            go.click();
+          }
+          return;
+        }
         if (phase !== 'play') return;
         if (k === 'ArrowLeft') { e.preventDefault(); game.nudge(-5, 0); }
         else if (k === 'ArrowRight') { e.preventDefault(); game.nudge(5, 0); }

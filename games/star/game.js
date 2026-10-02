@@ -117,8 +117,8 @@
 
     for (i = 0; i < stars.length; i++) {
       stars[i] = {
-        x: (Math.random() * W) | 0,
-        y: (Math.random() * H) | 0,
+        x: Math.random() * W,
+        y: Math.random() * H,
         v: 16 + (i % 5) * 7,
         hot: i % 5 === 0
       };
@@ -246,16 +246,17 @@
       for (n = 0; n < gifts.length; n++) {
         if (!gifts[n].on) { g = gifts[n]; break; }
       }
-      if (!g) {
-        if (!slot) return null;
-        g = gifts[0];
-      }
+      if (g || !slot) return g;
+      g = gifts[0];
+      for (n = 1; n < gifts.length; n++) if (gifts[n].t > g.t) g = gifts[n];
       return g;
     }
 
     function dropAt(x, y, kind, force) {
       var g = openGift(force);
       if (!g) return;
+      if (x < 4) x = 4;
+      if (x > W - 4) x = W - 4;
       g.on = true;
       g.x = x;
       g.y = y;
@@ -263,11 +264,21 @@
       g.t = 0;
     }
 
+    function putGift(slot, x, y, kind) {
+      if (x < 4) x = 4;
+      if (x > W - 4) x = W - 4;
+      slot.on = true;
+      slot.x = x;
+      slot.y = y;
+      slot.kind = kind;
+      slot.t = 0;
+    }
+
     function maybeDrop(x, y, fromBoss) {
       var r = Math.random();
       if (fromBoss) {
-        dropAt(x - 5, y, 2, true);
-        dropAt(x + 5, y, r < 0.5 ? 3 : 0, true);
+        putGift(gifts[0], x - 5, y, 2);
+        putGift(gifts[1], x + 5, y, r < 0.5 ? 3 : 0);
         return;
       }
       if (r < 0.36) return;
@@ -286,6 +297,7 @@
         if (hp >= maxHp) score += 40;
         hp += add;
         if (hp > maxHp) hp = maxHp;
+        if (hp >= maxHp) hurt = false;
         boom(px, pyHold(), 3);
         return;
       }
@@ -303,9 +315,11 @@
           gun = 0;
           maxHp = HULL_HP[hull];
           hp = maxHp;
+          hurt = false;
           fitPlayer();
         } else {
           hp = maxHp;
+          hurt = false;
           score += 400;
         }
         morph = 640;
@@ -509,6 +523,10 @@
         shake -= dt;
         if (shake < 0) shake = 0;
       }
+      if (morph > 0) {
+        morph -= dt;
+        if (morph < 0) morph = 0;
+      }
     }
 
     function reset() {
@@ -557,7 +575,6 @@
       k = dt * 0.001;
       px += (tx - px) * (1 - Math.exp(-dt / 46));
       py += (ty - py) * (1 - Math.exp(-dt / 46));
-      if (morph > 0) morph -= dt;
       if (shield > 0) shield -= dt;
       if (shield < 0) shield = 0;
       if (shieldFlash > 0) shieldFlash -= dt;
@@ -568,8 +585,8 @@
         s = stars[n];
         s.y += s.v * k;
         if (s.y >= H) {
-          s.y = 0;
-          s.x = (Math.random() * W) | 0;
+          s.y -= H;
+          s.x = Math.random() * W;
         }
       }
       if (phase === 'gap') {
@@ -1146,28 +1163,35 @@
       else drawGruntShip(ctx, kind, x, y, sc, face);
     }
 
+    function drawDrift(ctx, s, shakeX) {
+      var len = s.v * unit * 0.034;
+      if (len < 1) len = 1;
+      if (s.hot && len < 2) len = 2;
+      if (len > 7) len = 7;
+      ctx.fillRect(Math.round(s.x * unit + shakeX), s.y * unit - len, 1, len);
+    }
+
     function paint(ctx) {
       var n, s, f, dot, pulse, u;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       u = 0;
-      if (shake > 0) u = Math.sin(time * 0.045) * 0.65;
-      ctx.setTransform(unit, 0, 0, unit, u * unit, 0);
+      if (shake > 0) u = Math.sin(time * 0.045) * 0.65 * unit;
       if (!playing && !over) return;
-      dot = 1 / unit;
       ctx.fillStyle = '#737373';
       for (n = 0; n < stars.length; n++) {
         s = stars[n];
-        if (s.hot) continue;
-        ctx.fillRect(s.x | 0, s.y | 0, dot, dot);
+        if (!s.hot) drawDrift(ctx, s, u);
       }
       ctx.fillStyle = '#ececec';
       for (n = 0; n < stars.length; n++) {
         s = stars[n];
-        if (!s.hot) continue;
-        ctx.fillRect(s.x | 0, (s.y | 0) - dot, dot, dot * 2);
+        if (s.hot) drawDrift(ctx, s, u);
       }
+      ctx.globalAlpha = 1;
+      ctx.setTransform(unit, 0, 0, unit, u, 0);
+      dot = 1 / unit;
       ctx.lineJoin = 'miter';
       ctx.lineCap = 'butt';
       ctx.lineWidth = 1.12 / unit;

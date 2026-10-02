@@ -349,14 +349,23 @@ body.star .readout {
 }
 
 body.star .stage {
+  flex-direction: column;
+  align-items: center;
   justify-content: flex-start;
+  padding-top: 10px;
 }
 
 body.star .field {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   flex: none;
+  align-self: stretch;
+  width: 100%;
   margin-top: 0;
+  padding: 0;
+  overflow: hidden;
   box-shadow: 0 0 0 1px var(--line);
 }
 
@@ -365,29 +374,34 @@ body.star .field canvas {
   margin: 0;
 }
 
-body.star .hullbar {
+body.star .card {
+  width: min(280px, calc(100% - 28px));
+}
+
+body.star .card .go {
+  min-width: 0;
+  width: min(148px, 100%);
+}
+
+body.star .hull {
   flex: none;
-  position: relative;
-  height: 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   margin: 0;
-  background: #1a1a1a;
-  border: 0;
+  padding: 8px 0 0;
+  color: var(--dim);
+  font-size: 10px;
+  letter-spacing: 0.16em;
 }
 
-body.star .hullbar i,
-body.star .hullbar b {
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: block;
-  height: 2px;
-  width: 100%;
-  background: #ececec;
-}
-
-body.star .hullbar b {
-  width: 0;
-  background: #fff;
+body.star .hull b {
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
 }
 
 .stage {

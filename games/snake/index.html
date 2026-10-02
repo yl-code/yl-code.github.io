@@ -81,6 +81,9 @@
       var sx = 0;
       var sy = 0;
       var tracking = false;
+      var locked = false;
+      var lockX = 0;
+      var lockY = 0;
 
       function digits(n, width) {
         return String(n).padStart(width, '0');
@@ -117,6 +120,8 @@
         timer = 0;
         if (raf) cancelAnimationFrame(raf);
         raf = 0;
+        if (fxRaf) cancelAnimationFrame(fxRaf);
+        fxRaf = 0;
       }
 
       function bestKey() {
@@ -245,8 +250,10 @@
       }
 
       function steer(x, y) {
-        if (phase !== 'play') return;
-        game.turn(x, y);
+        if (phase !== 'play') return false;
+        if (!game.turn(x, y)) return false;
+        paint();
+        return true;
       }
 
       document.getElementById('up').addEventListener('pointerdown', function (e) { e.preventDefault(); steer(0, -1); });
@@ -254,22 +261,53 @@
       document.getElementById('left').addEventListener('pointerdown', function (e) { e.preventDefault(); steer(-1, 0); });
       document.getElementById('right').addEventListener('pointerdown', function (e) { e.preventDefault(); steer(1, 0); });
 
+      function swipe(e, release) {
+        var dx, dy, adx, ady, x, y, need;
+        if (!tracking) return;
+        dx = e.clientX - sx;
+        dy = e.clientY - sy;
+        adx = Math.abs(dx);
+        ady = Math.abs(dy);
+        need = locked ? 36 : 14;
+        if (adx < need && ady < need) {
+          if (release) tracking = false;
+          return;
+        }
+        if (adx > ady) { x = dx < 0 ? -1 : 1; y = 0; }
+        else { x = 0; y = dy < 0 ? -1 : 1; }
+        if (locked && x === lockX && y === lockY) {
+          sx = e.clientX;
+          sy = e.clientY;
+          if (release) tracking = false;
+          return;
+        }
+        if (steer(x, y)) {
+          locked = true;
+          lockX = x;
+          lockY = y;
+          sx = e.clientX;
+          sy = e.clientY;
+        } else if (!locked) {
+          sx = e.clientX;
+          sy = e.clientY;
+        }
+        if (release) tracking = false;
+      }
       canvas.addEventListener('pointerdown', function (e) {
         if (phase !== 'play') return;
         tracking = true;
+        locked = false;
+        lockX = 0;
+        lockY = 0;
         sx = e.clientX;
         sy = e.clientY;
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
       });
-      canvas.addEventListener('pointerup', function (e) {
-        var dx, dy;
-        if (!tracking) return;
+      canvas.addEventListener('pointermove', function (e) { swipe(e, false); });
+      canvas.addEventListener('pointerup', function (e) { swipe(e, true); });
+      canvas.addEventListener('pointercancel', function () {
         tracking = false;
-        if (phase !== 'play') return;
-        dx = e.clientX - sx;
-        dy = e.clientY - sy;
-        if (Math.abs(dx) < 18 && Math.abs(dy) < 18) return;
-        if (Math.abs(dx) > Math.abs(dy)) steer(dx < 0 ? -1 : 1, 0);
-        else steer(0, dy < 0 ? -1 : 1);
+        locked = false;
       });
 
       pauseBtn.addEventListener('click', function () {
@@ -282,7 +320,13 @@
       });
       addEventListener('keydown', function (e) {
         var k = e.key;
-        if (k === 'Enter') { go.click(); return; }
+        if (k === 'Enter') {
+          if (!mask.hidden) {
+            e.preventDefault();
+            go.click();
+          }
+          return;
+        }
         if (phase !== 'play') return;
         if (k === 'ArrowLeft') { e.preventDefault(); steer(-1, 0); }
         else if (k === 'ArrowRight') { e.preventDefault(); steer(1, 0); }

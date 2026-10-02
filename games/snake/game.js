@@ -50,6 +50,13 @@
     var sborn = new Float32Array(SPARKS);
     var slife = new Float32Array(SPARKS);
     var sparkN = 0;
+    var aimX = 1;
+    var aimY = 0;
+    var aimAt = 0;
+    var bend = 0;
+    var fixX = 0;
+    var fixY = 0;
+    var fixAt = 0;
 
     function idx(i) {
       return (head - i + MAX) % MAX;
@@ -76,7 +83,7 @@
       for (k = 0; k < 40; k++) {
         x = (Math.random() * COLS) | 0;
         y = (Math.random() * ROWS) | 0;
-        if (!occupied(x, y, false)) {
+        if (freeFood(x, y)) {
           fx = x;
           fy = y;
           return;
@@ -84,7 +91,7 @@
       }
       for (y = 0; y < ROWS; y++) {
         for (x = 0; x < COLS; x++) {
-          if (!occupied(x, y, false)) {
+          if (freeFood(x, y)) {
             fx = x;
             fy = y;
             return;
@@ -97,6 +104,11 @@
 
     function spec() {
       return RANKS[rank] || RANKS[1];
+    }
+
+    function freeFood(x, y) {
+      if (occupied(x, y, false)) return false;
+      return !(bx >= 0 && x === bx && y === by);
     }
 
     function openCell(x, y) {
@@ -116,6 +128,16 @@
           by = y;
           bleft = 22;
           return;
+        }
+      }
+      for (y = 0; y < ROWS; y++) {
+        for (x = 0; x < COLS; x++) {
+          if (openCell(x, y)) {
+            bx = x;
+            by = y;
+            bleft = 22;
+            return;
+          }
         }
       }
     }
@@ -142,27 +164,49 @@
       ready = true;
       won = false;
       step = spec().step;
+      sparkN = 0;
+      aimX = dx;
+      aimY = dy;
+      aimAt = 0;
+      bend = 0;
+      fixX = 0;
+      fixY = 0;
+      fixAt = 0;
       placeFood();
     }
 
     function turn(x, y) {
       var lx, ly;
-      if (!alive) return;
+      if (!alive) return false;
       lx = dx;
       ly = dy;
-      if (qn === 1) { lx = q1x; ly = q1y; }
-      else if (qn === 2) { lx = q2x; ly = q2y; }
-      if (lx === x && ly === y) return;
-      if (lx === -x && ly === -y) return;
-      if (qn === 0) { q1x = x; q1y = y; qn = 1; }
-      else if (qn === 1) { q2x = x; q2y = y; qn = 2; }
-      else { q2x = x; q2y = y; }
+      if (qn) { lx = q1x; ly = q1y; }
+      if (lx === x && ly === y) return false;
+      if (lx === -x && ly === -y) return false;
+      if (qn === 0) {
+        q1x = x;
+        q1y = y;
+        qn = 1;
+        bend = glide;
+        aimX = x;
+        aimY = y;
+        aimAt = performance.now();
+      } else if (qn === 1) {
+        q2x = x;
+        q2y = y;
+        qn = 2;
+      } else {
+        q2x = x;
+        q2y = y;
+      }
+      return true;
     }
 
     function applyTurn() {
       if (!qn) return;
       dx = q1x;
       dy = q1y;
+      bend = 0;
       if (qn === 2) {
         q1x = q2x;
         q1y = q2y;
@@ -170,12 +214,25 @@
       } else {
         qn = 0;
       }
+      aimX = qn ? q1x : dx;
+      aimY = qn ? q1y : dy;
+      aimAt = performance.now();
     }
 
     function tick() {
-      var nx, ny, eat, p;
+      var nx, ny, eat, p, vis;
       if (!alive) return won ? 'win' : 'dead';
+      if (qn && bend > 0) vis = headOffset(glide);
       applyTurn();
+      if (vis) {
+        fixX = vis[0] - dx;
+        fixY = vis[1] - dy;
+        if (fixX * fixX + fixY * fixY < 0.008) {
+          fixX = 0;
+          fixY = 0;
+        }
+        fixAt = performance.now();
+      }
       nx = xs[head] + dx;
       ny = ys[head] + dy;
       if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) {
@@ -195,6 +252,11 @@
         score += spec().bonus;
         bx = -1;
         by = -1;
+        if (len >= MAX) {
+          won = true;
+          alive = false;
+          return 'win';
+        }
         return 'eat';
       }
       eat = nx === fx && ny === fy;
@@ -240,6 +302,8 @@
     function die(x, y) {
       var i, p;
       alive = false;
+      fixX = 0;
+      fixY = 0;
       burst(x + 0.5, y + 0.5, 16, true);
       for (i = 0; i < len; i += 2) {
         p = idx(i);
@@ -258,29 +322,68 @@
       if (size >= 4) cell = size;
     }
 
-    function blocked(x, y) {
-      var nx = xs[head] + x;
-      var ny = ys[head] + y;
-      return nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS;
-    }
-
-    function heading() {
-      if (qn && blocked(dx, dy) && !blocked(q1x, q1y)) return [q1x, q1y];
-      return [dx, dy];
-    }
-
     function setGlide(t) {
-      var h = heading();
-      if (!alive || blocked(h[0], h[1])) t = 0;
+      if (!alive) t = 0;
       glide = t < 0 ? 0 : t > 1 ? 1 : t;
     }
 
-    function willGrow() {
-      var h = heading();
-      var nx = xs[head] + h[0];
-      var ny = ys[head] + h[1];
-      if (nx === fx && ny === fy) return true;
-      return bx >= 0 && nx === bx && ny === by;
+    function nextStep() {
+      if (qn) return [q1x, q1y];
+      return [dx, dy];
+    }
+
+    function headOffset(t) {
+      var ox, oy, span, u;
+      if (!qn) return [dx * t, dy * t];
+      if (bend <= 0) return [q1x * t, q1y * t];
+      if (t <= bend) return [dx * t, dy * t];
+      ox = dx * bend;
+      oy = dy * bend;
+      span = 1 - bend;
+      u = span > 0 ? (t - bend) / span : 1;
+      if (u > 1) u = 1;
+      return [ox + (q1x - ox) * u, oy + (q1y - oy) * u];
+    }
+
+    function decayFix() {
+      var now, dt, mag, step, keep;
+      mag = Math.sqrt(fixX * fixX + fixY * fixY);
+      if (mag < 0.02) {
+        fixX = 0;
+        fixY = 0;
+        return;
+      }
+      now = performance.now();
+      dt = fixAt ? now - fixAt : 16;
+      fixAt = now;
+      if (dt < 0) dt = 0;
+      if (dt > 32) dt = 32;
+      step = dt / 70;
+      if (step >= mag) {
+        fixX = 0;
+        fixY = 0;
+        return;
+      }
+      keep = (mag - step) / mag;
+      fixX *= keep;
+      fixY *= keep;
+    }
+
+    function relaxAim() {
+      var now = performance.now();
+      var dt = aimAt ? now - aimAt : 16;
+      var f = nextStep();
+      var k;
+      aimAt = now;
+      if (dt < 0) dt = 0;
+      if (dt > 48) dt = 48;
+      k = 1 - Math.exp(-dt / 36);
+      aimX += (f[0] - aimX) * k;
+      aimY += (f[1] - aimY) * k;
+      if ((aimX - f[0]) * (aimX - f[0]) + (aimY - f[1]) * (aimY - f[1]) < 0.0004) {
+        aimX = f[0];
+        aimY = f[1];
+      }
     }
 
     function brick(g, x, y, p, mark) {
@@ -343,61 +446,71 @@
       }
     }
 
-    function partAt(i, t, grow) {
-      var a, b, x, y;
+    function partAt(i, t) {
+      var a, b, x, y, off;
       if (i === 0) {
-        var h = heading();
-        x = xs[head] + h[0] * t;
-        y = ys[head] + h[1] * t;
+        off = headOffset(t);
+        x = xs[head] + off[0] + fixX;
+        y = ys[head] + off[1] + fixY;
         if (x < 0) x = 0;
         if (y < 0) y = 0;
         if (x > COLS - 1) x = COLS - 1;
         if (y > ROWS - 1) y = ROWS - 1;
         return [x, y];
       }
-      if (grow && i === len) {
-        a = idx(len - 1);
-        return [xs[a], ys[a]];
-      }
       a = idx(i);
       b = idx(i - 1);
       return [xs[a] + (xs[b] - xs[a]) * t, ys[a] + (ys[b] - ys[a]) * t];
     }
 
+    function drawHead(g, gx, gy, p) {
+      var mag = Math.sqrt(aimX * aimX + aimY * aimY) || 1;
+      var cx = (gx + 0.5) * p;
+      var cy = (gy + 0.5) * p;
+      var fx = aimX / mag;
+      var fy = aimY / mag;
+      var sx = -fy;
+      var sy = fx;
+      var nose = p * 0.46;
+      var back = p * 0.22;
+      var wide = p * 0.3;
+      g.fillStyle = '#fff';
+      g.beginPath();
+      g.moveTo(cx + fx * nose, cy + fy * nose);
+      g.lineTo(cx + sx * wide - fx * back, cy + sy * wide - fy * back);
+      g.lineTo(cx - fx * back * 0.2, cy - fy * back * 0.2);
+      g.lineTo(cx - sx * wide - fx * back, cy - sy * wide - fy * back);
+      g.closePath();
+      g.fill();
+    }
+
     function node(g, gx, gy, p, shade, head) {
-      var side = Math.max(3, Math.round(p * (head ? 0.7 : 0.22 + 0.26 * shade)));
-      var x = Math.round((gx + 0.5) * p - side / 2);
-      var y = Math.round((gy + 0.5) * p - side / 2);
+      var side = Math.max(3, Math.round(p * (0.2 + 0.22 * shade)));
+      var x = (gx + 0.5) * p - side / 2;
+      var y = (gy + 0.5) * p - side / 2;
       var e = Math.max(1, Math.round(Math.max(2, side) / 6));
       var c = Math.round(72 + 164 * shade);
-      var cx, cy, m;
+      if (head) {
+        drawHead(g, gx, gy, p);
+        return;
+      }
       g.fillStyle = 'rgb(' + c + ',' + c + ',' + c + ')';
       g.fillRect(x, y, side, e);
       g.fillRect(x, y + side - e, side, e);
       g.fillRect(x, y + e, e, side - e * 2);
       g.fillRect(x + side - e, y + e, e, side - e * 2);
-      if (!head) return;
-      cx = (gx + 0.5) * p;
-      cy = (gy + 0.5) * p;
-      m = side * 0.22;
-      var h = heading();
-      g.fillStyle = '#fff';
-      g.beginPath();
-      if (h[0] > 0) { g.moveTo(cx + m, cy); g.lineTo(cx - m * 0.4, cy - m); g.lineTo(cx - m * 0.4, cy + m); }
-      else if (h[0] < 0) { g.moveTo(cx - m, cy); g.lineTo(cx + m * 0.4, cy - m); g.lineTo(cx + m * 0.4, cy + m); }
-      else if (h[1] > 0) { g.moveTo(cx, cy + m); g.lineTo(cx - m, cy - m * 0.4); g.lineTo(cx + m, cy - m * 0.4); }
-      else { g.moveTo(cx, cy - m); g.lineTo(cx - m, cy + m * 0.4); g.lineTo(cx + m, cy + m * 0.4); }
-      g.closePath();
-      g.fill();
     }
 
     function paint(ctx) {
       var s = cell;
       var t = alive ? glide : 0;
-      var grow = alive && willGrow();
-      var n = grow ? len + 1 : len;
+      var n = len;
       var i, at, shade, cx, cy, r, c;
       ensureGrid();
+      if (alive) {
+        decayFix();
+        relaxAim();
+      }
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.drawImage(grid, 0, 0);
       if (!ready || len < 1) {
@@ -431,22 +544,23 @@
         ctx.lineTo(cx + r, cy);
         ctx.stroke();
       }
-      ctx.lineCap = 'square';
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
       for (i = n - 1; i >= 1; i--) {
-        at = partAt(i, t, grow);
+        at = partAt(i, t);
         shade = 1 - i / (n - 1);
         cx = (at[0] + 0.5) * s;
         cy = (at[1] + 0.5) * s;
-        r = partAt(i - 1, t, grow);
+        r = partAt(i - 1, t);
         ctx.strokeStyle = 'rgb(' + (c = Math.round(48 + 140 * shade)) + ',' + c + ',' + c + ')';
-        ctx.lineWidth = Math.max(1, s * (0.06 + 0.1 * shade));
+        ctx.lineWidth = Math.max(1, s * (0.08 + 0.12 * shade));
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo((r[0] + 0.5) * s, (r[1] + 0.5) * s);
         ctx.stroke();
       }
       for (i = n - 1; i >= 0; i--) {
-        at = partAt(i, t, grow);
+        at = partAt(i, t);
         shade = n <= 1 ? 1 : 1 - i / (n - 1);
         node(ctx, at[0], at[1], s, shade, i === 0);
       }
@@ -461,7 +575,6 @@
       paint: paint,
       prepare: prepare,
       setGlide: setGlide,
-      facingWall: facingWall,
       hot: function () { return sparkN > 0; },
       setFood: function (x, y) { fx = x; fy = y; },
       delay: function () { return step; },
